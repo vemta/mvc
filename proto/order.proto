@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option go_package = "/pb";
+
+message OrderRequest {
+    string order = 1;
+}
+
+message OrderResponse {
+    bool success = 1;
+    string error = 2;
+    string serializedOrder = 3;
+}
+
+message GetFinalPriceRequest {
+    string order = 1;
+}
+
+message GetFinalPriceResponse {
+    bool success = 1;
+    string error = 2;
+    double price = 3;
+}
+
+service OrderService {
+    rpc GetFinalPrice(GetFinalPriceRequest) returns (GetFinalPriceResponse) {}
+}
