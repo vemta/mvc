@@ -31,3 +31,9 @@ type VmtOrderdetail struct {
 	Item     string `json:"item"`
 	Quantity int32  `json:"quantity"`
 }
+
+type VmtUser struct {
+	Email     string    `json:"email"`
+	Fullname  string    `json:"fullname"`
+	Birthdate time.Time `json:"birthdate"`
+}

@@ -1,3 +1,9 @@
+CREATE TABLE VMT_Users (
+	Email VARCHAR(64) PRIMARY KEY NOT NULL,
+	FullName VARCHAR(128) NOT NULL,
+	Birthdate DATE NOT NULL
+);
+
 CREATE TABLE VMT_Orders (
     ID                 VARCHAR(64) PRIMARY KEY NOT NULL,
 	Customer           VARCHAR(64) NOT NULL,
@@ -20,7 +26,7 @@ CREATE TABLE VMT_Items (
     ID          VARCHAR(64) PRIMARY KEY NOT NULL,
 	Title       VARCHAR(512) NOT NULL,
 	Description VARCHAR(1024) NOT NULL,
-	IsGood      BIT NOT NULL,
+	IsGood      TINYINT(1) NOT NULL,
 	CreatedAt   DATETIME NOT NULL
 );
 

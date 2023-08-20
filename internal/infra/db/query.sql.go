@@ -49,3 +49,88 @@ func (q *Queries) FindItem(ctx context.Context, id string) (VmtItem, error) {
 	)
 	return i, err
 }
+
+const findOrder = `-- name: FindOrder :many
+SELECT
+VMT_Orders.ID OrderID,
+VMT_Orders.Price OrderPrice,
+VMT_Orders.PaymentMethod OrderPaymentMethod,
+VMT_Orders.Status OrderStatus,
+VMT_Orders.DiscountRaw OrderDiscountRaw,
+VMT_Orders.DiscountPercentual OrderDiscountPercentual,
+VMT_Users.Email CustomerEmail,
+VMT_Users.FullName CustomerFullName,
+VMT_Users.Birthdate CustomerBirthdate,
+VMT_Items.ID ItemID,
+VMT_Items.Title ItemTitle,
+VMT_Items.Description ItemDescription,
+VMT_Items.IsGood ItemIsGood,
+VMT_Items.CreatedAt ItemCreatedAt,
+
+VMT_OrderDetails.Quantity DetailQuantity
+
+FROM VMT_Orders 
+
+INNER JOIN VMT_Users on VMT_User.Email = VMT_Orders.Customer 
+INNER JOIN VMT_OrderDetails ON VMT_OrderDetails.OrderID = VMT_Orders.ID 
+INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
+
+WHERE VMT_Orders.ID = ?
+`
+
+type FindOrderRow struct {
+	Orderid                 string    `json:"orderid"`
+	Orderprice              float64   `json:"orderprice"`
+	Orderpaymentmethod      int32     `json:"orderpaymentmethod"`
+	Orderstatus             int32     `json:"orderstatus"`
+	Orderdiscountraw        float64   `json:"orderdiscountraw"`
+	Orderdiscountpercentual float64   `json:"orderdiscountpercentual"`
+	Customeremail           string    `json:"customeremail"`
+	Customerfullname        string    `json:"customerfullname"`
+	Customerbirthdate       time.Time `json:"customerbirthdate"`
+	Itemid                  string    `json:"itemid"`
+	Itemtitle               string    `json:"itemtitle"`
+	Itemdescription         string    `json:"itemdescription"`
+	Itemisgood              bool      `json:"itemisgood"`
+	Itemcreatedat           time.Time `json:"itemcreatedat"`
+	Detailquantity          int32     `json:"detailquantity"`
+}
+
+func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, error) {
+	rows, err := q.db.QueryContext(ctx, findOrder, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindOrderRow
+	for rows.Next() {
+		var i FindOrderRow
+		if err := rows.Scan(
+			&i.Orderid,
+			&i.Orderprice,
+			&i.Orderpaymentmethod,
+			&i.Orderstatus,
+			&i.Orderdiscountraw,
+			&i.Orderdiscountpercentual,
+			&i.Customeremail,
+			&i.Customerfullname,
+			&i.Customerbirthdate,
+			&i.Itemid,
+			&i.Itemtitle,
+			&i.Itemdescription,
+			&i.Itemisgood,
+			&i.Itemcreatedat,
+			&i.Detailquantity,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
