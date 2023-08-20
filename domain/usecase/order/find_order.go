@@ -22,7 +22,7 @@ func NewFindOrderUsecase(uow uow.UowInterface) *FindOrderUsecase {
 	}
 }
 
-func (u *FindOrderUsecase) Execute(ctx context.Context, input ItemFindUsecaseInput) (*entity.Item, error) {
+func (u *FindOrderUsecase) Execute(ctx context.Context, input FindOrderUsecaseInput) (*entity.Order, error) {
 	return u.getOrderRepository(ctx).FindOrder(ctx, input.ID)
 }
 

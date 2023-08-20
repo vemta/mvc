@@ -30,3 +30,23 @@ CREATE TABLE VMT_Items (
 	CreatedAt   DATETIME NOT NULL
 );
 
+CREATE TABLE VMT_ItemsValuation (
+	ItemID VARCHAR(64) PRIMARY KEY NOT NULL,
+	LastPrice DECIMAL(10,2) NOT NULL,
+	LastCost DECIMAL(10,2) NOT NULL,
+	DiscountRaw DECIMAL(10,2) NOT NULL,
+	DiscountPercentual DECIMAL(10,2) NOT NULL,
+	UpdatedAt DATETIME NOT NULL
+);
+
+CREATE TABLE VMT_ItemValuationLog (
+	Item VARCHAR(64) NOT NULL,
+	Price DECIMAL(10,2) NOT NULL,
+	ValuationType ENUM("Price", "Cost") NOT NULL,
+	ValorizatedAt DATETIME NOT NULL,
+	DiscountRaw DECIMAL(10,2) NOT NULL,
+	DiscountPercentual DECIMAL(10,2) NOT NULL
+);
+
+
+

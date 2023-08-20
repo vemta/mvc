@@ -41,10 +41,70 @@ func (r *ItemRepository) FindItem(ctx context.Context, value string) (*entity.It
 		return nil, err
 	}
 
+	costHistory, err := r.FindItemCostHistory(ctx, value)
+	if err != nil {
+		return nil, err
+	}
+
+	priceHistory, err := r.FindItemPriceHistory(ctx, value)
+	if err != nil {
+		return nil, err
+	}
+
 	return &entity.Item{
 		ID:          item.ID,
 		Title:       item.Title,
 		IsGood:      item.Isgood,
 		Description: item.Description,
+		Valuation: &entity.ItemValuation{
+			PriceHistory:       *priceHistory,
+			CostHistory:        *costHistory,
+			DiscountRaw:        item.Discountraw,
+			DiscountPercentual: item.Discountpercentual,
+			LastCost:           item.Lastcost,
+			LastPrice:          item.Lastprice,
+		},
 	}, nil
+}
+
+func (r *ItemRepository) FindItemCostHistory(ctx context.Context, value string) (*[]entity.ItemValuationLog, error) {
+	logs, err := r.Queries.FindItemCostHistory(ctx, value)
+
+	if err != nil {
+		return nil, err
+	}
+
+	log := make([]entity.ItemValuationLog, 0, len(logs))
+
+	for _, entry := range logs {
+		log = append(log, entity.ItemValuationLog{
+			Value:              entry.Price,
+			DiscountRaw:        entry.Discountraw,
+			DiscountPercentual: entry.Discountpercentual,
+			UpdatedAt:          entry.Valorizatedat,
+		})
+	}
+
+	return &log, nil
+}
+
+func (r *ItemRepository) FindItemPriceHistory(ctx context.Context, value string) (*[]entity.ItemValuationLog, error) {
+	logs, err := r.Queries.FindItemPriceHistory(ctx, value)
+
+	if err != nil {
+		return nil, err
+	}
+
+	log := make([]entity.ItemValuationLog, 0, len(logs))
+
+	for _, entry := range logs {
+		log = append(log, entity.ItemValuationLog{
+			Value:              entry.Price,
+			DiscountRaw:        entry.Discountraw,
+			DiscountPercentual: entry.Discountpercentual,
+			UpdatedAt:          entry.Valorizatedat,
+		})
+	}
+
+	return &log, nil
 }

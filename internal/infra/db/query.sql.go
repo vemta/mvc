@@ -34,20 +34,110 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 }
 
 const findItem = `-- name: FindItem :one
-SELECT id, title, description, isgood, createdat FROM VMT_Items WHERE ID = ?
+SELECT id, title, description, isgood, createdat, itemid, lastprice, lastcost, discountraw, discountpercentual, updatedat FROM VMT_Items 
+INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
+WHERE ID = ?
 `
 
-func (q *Queries) FindItem(ctx context.Context, id string) (VmtItem, error) {
+type FindItemRow struct {
+	ID                 string    `json:"id"`
+	Title              string    `json:"title"`
+	Description        string    `json:"description"`
+	Isgood             bool      `json:"isgood"`
+	Createdat          time.Time `json:"createdat"`
+	Itemid             string    `json:"itemid"`
+	Lastprice          float64   `json:"lastprice"`
+	Lastcost           float64   `json:"lastcost"`
+	Discountraw        float64   `json:"discountraw"`
+	Discountpercentual float64   `json:"discountpercentual"`
+	Updatedat          time.Time `json:"updatedat"`
+}
+
+func (q *Queries) FindItem(ctx context.Context, id string) (FindItemRow, error) {
 	row := q.db.QueryRowContext(ctx, findItem, id)
-	var i VmtItem
+	var i FindItemRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
 		&i.Description,
 		&i.Isgood,
 		&i.Createdat,
+		&i.Itemid,
+		&i.Lastprice,
+		&i.Lastcost,
+		&i.Discountraw,
+		&i.Discountpercentual,
+		&i.Updatedat,
 	)
 	return i, err
+}
+
+const findItemCostHistory = `-- name: FindItemCostHistory :many
+SELECT item, price, valuationtype, valorizatedat, discountraw, discountpercentual FROM VMT_ItemValuationLog WHERE Item = ? AND Type = 'Cost'
+`
+
+func (q *Queries) FindItemCostHistory(ctx context.Context, item string) ([]VmtItemvaluationlog, error) {
+	rows, err := q.db.QueryContext(ctx, findItemCostHistory, item)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []VmtItemvaluationlog
+	for rows.Next() {
+		var i VmtItemvaluationlog
+		if err := rows.Scan(
+			&i.Item,
+			&i.Price,
+			&i.Valuationtype,
+			&i.Valorizatedat,
+			&i.Discountraw,
+			&i.Discountpercentual,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findItemPriceHistory = `-- name: FindItemPriceHistory :many
+SELECT item, price, valuationtype, valorizatedat, discountraw, discountpercentual FROM VMT_ItemValuationLog WHERE Item = ? AND Type = 'Price'
+`
+
+func (q *Queries) FindItemPriceHistory(ctx context.Context, item string) ([]VmtItemvaluationlog, error) {
+	rows, err := q.db.QueryContext(ctx, findItemPriceHistory, item)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []VmtItemvaluationlog
+	for rows.Next() {
+		var i VmtItemvaluationlog
+		if err := rows.Scan(
+			&i.Item,
+			&i.Price,
+			&i.Valuationtype,
+			&i.Valorizatedat,
+			&i.Discountraw,
+			&i.Discountpercentual,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const findOrder = `-- name: FindOrder :many
@@ -66,6 +156,10 @@ VMT_Items.Title ItemTitle,
 VMT_Items.Description ItemDescription,
 VMT_Items.IsGood ItemIsGood,
 VMT_Items.CreatedAt ItemCreatedAt,
+VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
+VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
+VMT_ItemsValuation.LastPrice ItemPrice,
+VMT_ItemsValuation.LastCost ItemCost,
 
 VMT_OrderDetails.Quantity DetailQuantity
 
@@ -74,6 +168,7 @@ FROM VMT_Orders
 INNER JOIN VMT_Users on VMT_User.Email = VMT_Orders.Customer 
 INNER JOIN VMT_OrderDetails ON VMT_OrderDetails.OrderID = VMT_Orders.ID 
 INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
+INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
 
 WHERE VMT_Orders.ID = ?
 `
@@ -93,6 +188,10 @@ type FindOrderRow struct {
 	Itemdescription         string    `json:"itemdescription"`
 	Itemisgood              bool      `json:"itemisgood"`
 	Itemcreatedat           time.Time `json:"itemcreatedat"`
+	Itemdiscountraw         float64   `json:"itemdiscountraw"`
+	Itemdiscountpercentual  float64   `json:"itemdiscountpercentual"`
+	Itemprice               float64   `json:"itemprice"`
+	Itemcost                float64   `json:"itemcost"`
 	Detailquantity          int32     `json:"detailquantity"`
 }
 
@@ -120,6 +219,10 @@ func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, err
 			&i.Itemdescription,
 			&i.Itemisgood,
 			&i.Itemcreatedat,
+			&i.Itemdiscountraw,
+			&i.Itemdiscountpercentual,
+			&i.Itemprice,
+			&i.Itemcost,
 			&i.Detailquantity,
 		); err != nil {
 			return nil, err

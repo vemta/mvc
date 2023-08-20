@@ -65,18 +65,11 @@ func (r *OrderRepository) FindOrder(ctx context.Context, value string) (*entity.
 				Title:  entry.Itemtitle,
 				IsGood: entry.Itemisgood,
 			},
-			Quantity: int(entry.Detailquantity.Int32),
+			Quantity: int(entry.Detailquantity),
 		})
 	}
 
-	if err != nil {
-		return nil, err
-	}
+	order.Details = &details
 
-	return &entity.Item{
-		ID:          item.ID,
-		Title:       item.Title,
-		IsGood:      item.Isgood,
-		Description: item.Description,
-	}, nil
+	return &order, nil
 }
