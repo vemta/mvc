@@ -5,7 +5,8 @@ import (
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/vemta/mvc/domain/repository"
+	"github.com/vemta/mvc/internal/infra/db"
+	repository2 "github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 
@@ -30,19 +31,7 @@ func main() {
 
 func registerRepositories(uow *uow.Uow) {
 	uow.Register("OrderRepository", func(tx *sql.Tx) interface{} {
-		repo := repository.NewLoginRepository(uow.Db)
-		repo.Queries = db.New(tx)
-		return repo
-	})
-
-	uow.Register("PluginRepository", func(tx *sql.Tx) interface{} {
-		repo := repository.NewPluginRepository(uow.Db)
-		repo.Queries = db.New(tx)
-		return repo
-	})
-
-	uow.Register("ReleaseRepository", func(tx *sql.Tx) interface{} {
-		repo := repository.NewPluginRepository(uow.Db)
+		repo := repository2.NewItemRepository(uow.Db)
 		repo.Queries = db.New(tx)
 		return repo
 	})
