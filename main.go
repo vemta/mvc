@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/vemta/mvc/domain/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 

@@ -1,0 +1,19 @@
+version: "3"
+
+networks:
+  vemta-backend:
+    external: true
+
+services:
+
+  mvc:
+    build: .
+    networks:
+      - vemta-backend
+    volumes:
+      - .:/go/src
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    ports:
+      - "8081:8081"
+      - "3333:3333"
