@@ -1,4 +1,4 @@
 github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrtU8EI=
 github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
-github.com/vemta/common v1.0.14 h1:eDGUoJRk465MD+mFRX/NzLdMoeRWHcxM089sp+3eAQY=
-github.com/vemta/common v1.0.14/go.mod h1:zd7d1t29d+Bt7jVVc70ruY5pgd7hZ+iqirIkfH2lHsk=
+github.com/vemta/common v1.0.16 h1:Mt/sJJOwDNivX4DKi3fzuGEWqkvq7vy/JBvWUKfqIHQ=
+github.com/vemta/common v1.0.16/go.mod h1:zd7d1t29d+Bt7jVVc70ruY5pgd7hZ+iqirIkfH2lHsk=

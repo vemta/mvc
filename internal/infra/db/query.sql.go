@@ -33,6 +33,70 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 	return err
 }
 
+const findCustomerOrders = `-- name: FindCustomerOrders :many
+SELECT
+VMT_Orders.ID OrderId,
+VMT_Customers.Email CustomerEmail,
+VMT_Customers.FullName CustomerFullName,
+VMT_Customers.Birthdate CustomerBirthdate,
+VMT_Orders.Customer Customer,
+VMT_Orders.Price OrderPrice,
+VMT_Orders.PaymentMethod PaymentMethod,
+VMT_Orders.Status OrderStatus,
+VMT_Orders.DiscountRaw DiscountRaw,
+VMT_Orders.DiscountPercentual DiscountPercentual
+FROM VMT_Orders
+INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer 
+WHERE VMT_Customers.Email = ? ORDER BY VMT_Orders.ID
+`
+
+type FindCustomerOrdersRow struct {
+	Orderid            string    `json:"orderid"`
+	Customeremail      string    `json:"customeremail"`
+	Customerfullname   string    `json:"customerfullname"`
+	Customerbirthdate  time.Time `json:"customerbirthdate"`
+	Customer           string    `json:"customer"`
+	Orderprice         float64   `json:"orderprice"`
+	Paymentmethod      int32     `json:"paymentmethod"`
+	Orderstatus        int32     `json:"orderstatus"`
+	Discountraw        float64   `json:"discountraw"`
+	Discountpercentual float64   `json:"discountpercentual"`
+}
+
+func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindCustomerOrdersRow, error) {
+	rows, err := q.db.QueryContext(ctx, findCustomerOrders, email)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindCustomerOrdersRow
+	for rows.Next() {
+		var i FindCustomerOrdersRow
+		if err := rows.Scan(
+			&i.Orderid,
+			&i.Customeremail,
+			&i.Customerfullname,
+			&i.Customerbirthdate,
+			&i.Customer,
+			&i.Orderprice,
+			&i.Paymentmethod,
+			&i.Orderstatus,
+			&i.Discountraw,
+			&i.Discountpercentual,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findItem = `-- name: FindItem :one
 SELECT id, title, description, isgood, createdat, itemid, lastprice, lastcost, discountraw, discountpercentual, updatedat FROM VMT_Items 
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
@@ -148,9 +212,9 @@ VMT_Orders.PaymentMethod OrderPaymentMethod,
 VMT_Orders.Status OrderStatus,
 VMT_Orders.DiscountRaw OrderDiscountRaw,
 VMT_Orders.DiscountPercentual OrderDiscountPercentual,
-VMT_Users.Email CustomerEmail,
-VMT_Users.FullName CustomerFullName,
-VMT_Users.Birthdate CustomerBirthdate,
+VMT_Customers.Email CustomerEmail,
+VMT_Customers.FullName CustomerFullName,
+VMT_Customers.Birthdate CustomerBirthdate,
 VMT_Items.ID ItemID,
 VMT_Items.Title ItemTitle,
 VMT_Items.Description ItemDescription,
@@ -160,16 +224,12 @@ VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
 VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
-
 VMT_OrderDetails.Quantity DetailQuantity
-
 FROM VMT_Orders 
-
-INNER JOIN VMT_Users on VMT_User.Email = VMT_Orders.Customer 
+INNER JOIN VMT_Customers on VMT_Customers.Email = VMT_Orders.Customer 
 INNER JOIN VMT_OrderDetails ON VMT_OrderDetails.OrderID = VMT_Orders.ID 
 INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
-
 WHERE VMT_Orders.ID = ?
 `
 

@@ -52,6 +52,12 @@ func (ns NullVmtItemvaluationlogValuationtype) Value() (driver.Value, error) {
 	return string(ns.VmtItemvaluationlogValuationtype), nil
 }
 
+type VmtCustomer struct {
+	Email     string    `json:"email"`
+	Fullname  string    `json:"fullname"`
+	Birthdate time.Time `json:"birthdate"`
+}
+
 type VmtItem struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
@@ -92,10 +98,4 @@ type VmtOrderdetail struct {
 	Orderid  string `json:"orderid"`
 	Item     string `json:"item"`
 	Quantity int32  `json:"quantity"`
-}
-
-type VmtUser struct {
-	Email     string    `json:"email"`
-	Fullname  string    `json:"fullname"`
-	Birthdate time.Time `json:"birthdate"`
 }

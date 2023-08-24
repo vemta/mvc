@@ -30,7 +30,7 @@ func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, input FindOrde
 	}
 
 	current := 0.0
-	for _, detail := range *order.Details {
+	for _, detail := range *order.Items {
 		uc := usecase.NewFindItemFinalPriceUsecase(u.Uow)
 		price, err := uc.Execute(ctx, usecase.FindItemFinalPriceUsecaseInput{
 			ID: detail.Item.ID,

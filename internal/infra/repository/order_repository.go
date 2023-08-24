@@ -42,11 +42,11 @@ func (r *OrderRepository) FindOrder(ctx context.Context, value string) (*entity.
 	}
 
 	order := entity.Order{}
-	details := make([]entity.OrderDetail, 0, len(orderFound))
+	details := make([]entity.OrderEntry, 0, len(orderFound))
 
 	for _, entry := range orderFound {
 
-		order.Customer = &entity.User{
+		order.Customer = &entity.Customer{
 			Email:     entry.Customeremail,
 			FullName:  entry.Customerfullname,
 			Birthdate: entry.Customerbirthdate,
@@ -59,17 +59,17 @@ func (r *OrderRepository) FindOrder(ctx context.Context, value string) (*entity.
 		order.Status = uint8(entry.Orderstatus)
 		order.PaymentMethod = int(entry.Orderpaymentmethod)
 
-		details = append(details, entity.OrderDetail{
+		details = append(details, entity.OrderEntry{
 			Item: &entity.Item{
 				ID:     entry.Itemid,
 				Title:  entry.Itemtitle,
 				IsGood: entry.Itemisgood,
 			},
-			Quantity: int(entry.Detailquantity),
+			Quantity: int64(entry.Detailquantity),
 		})
 	}
 
-	order.Details = &details
+	order.Items = &details
 
 	return &order, nil
 }
