@@ -8,6 +8,7 @@ services:
 
   mvc:
     build: .
+    container_name: vemta-mvc-application
     networks:
       - vemta-backend
     volumes:
