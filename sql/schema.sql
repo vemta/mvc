@@ -1,3 +1,7 @@
+CREATE TABLE VMT_SystemOptions (
+	BaseCurrency VARCHAR(3) NOT NULL
+);
+
 CREATE TABLE VMT_ItemCategories (
 	ID INT PRIMARY KEY NOT NULL,
 	Name VARCHAR(64) NOT NULL
@@ -53,6 +57,3 @@ CREATE TABLE VMT_ItemValuationLog (
 	DiscountRaw DECIMAL(10,2) NOT NULL,
 	DiscountPercentual DECIMAL(10,2) NOT NULL
 );
-
-
-

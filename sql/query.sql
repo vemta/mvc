@@ -29,6 +29,7 @@ VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
 VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
+VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
 VMT_OrderDetails.Quantity DetailQuantity
 FROM VMT_Orders 
 INNER JOIN VMT_Customers on VMT_Customers.Email = VMT_Orders.Customer 
@@ -68,6 +69,7 @@ VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
 VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
+VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
 VMT_OrderDetails.Quantity DetailQuantity
 FROM VMT_OrderDetails
 INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer 
@@ -82,3 +84,6 @@ SELECT * FROM VMT_Customers WHERE Email = ?;
 
 -- name: CreateCustomer :exec
 INSERT INTO VMT_Customers (Email, FullName, Birthdate) VALUES (?,?,?);
+
+-- name: UpdateItemValorization :exec
+UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, DiscountRaw = ?, DiscountPercentual = ?, UpdatedAt = ? WHERE ItemID = ?;

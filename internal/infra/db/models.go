@@ -105,3 +105,7 @@ type VmtOrderdetail struct {
 	Item     string `json:"item"`
 	Quantity int32  `json:"quantity"`
 }
+
+type VmtSystemoption struct {
+	Basecurrency string `json:"basecurrency"`
+}

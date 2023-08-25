@@ -83,6 +83,7 @@ VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
 VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
+VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
 VMT_OrderDetails.Quantity DetailQuantity
 FROM VMT_OrderDetails
 INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer 
@@ -116,6 +117,7 @@ type FindCustomerOrdersRow struct {
 	Itemdiscountpercentual float64   `json:"itemdiscountpercentual"`
 	Itemprice              float64   `json:"itemprice"`
 	Itemcost               float64   `json:"itemcost"`
+	Valuationupdatedat     time.Time `json:"valuationupdatedat"`
 	Detailquantity         int32     `json:"detailquantity"`
 }
 
@@ -151,6 +153,7 @@ func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindC
 			&i.Itemdiscountpercentual,
 			&i.Itemprice,
 			&i.Itemcost,
+			&i.Valuationupdatedat,
 			&i.Detailquantity,
 		); err != nil {
 			return nil, err
@@ -298,6 +301,7 @@ VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
 VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
+VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
 VMT_OrderDetails.Quantity DetailQuantity
 FROM VMT_Orders 
 INNER JOIN VMT_Customers on VMT_Customers.Email = VMT_Orders.Customer 
@@ -330,6 +334,7 @@ type FindOrderRow struct {
 	Itemdiscountpercentual  float64   `json:"itemdiscountpercentual"`
 	Itemprice               float64   `json:"itemprice"`
 	Itemcost                float64   `json:"itemcost"`
+	Valuationupdatedat      time.Time `json:"valuationupdatedat"`
 	Detailquantity          int32     `json:"detailquantity"`
 }
 
@@ -364,6 +369,7 @@ func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, err
 			&i.Itemdiscountpercentual,
 			&i.Itemprice,
 			&i.Itemcost,
+			&i.Valuationupdatedat,
 			&i.Detailquantity,
 		); err != nil {
 			return nil, err
@@ -377,4 +383,29 @@ func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, err
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateItemValorization = `-- name: UpdateItemValorization :exec
+UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, DiscountRaw = ?, DiscountPercentual = ?, UpdatedAt = ? WHERE ItemID = ?
+`
+
+type UpdateItemValorizationParams struct {
+	Lastprice          float64   `json:"lastprice"`
+	Lastcost           float64   `json:"lastcost"`
+	Discountraw        float64   `json:"discountraw"`
+	Discountpercentual float64   `json:"discountpercentual"`
+	Updatedat          time.Time `json:"updatedat"`
+	Itemid             string    `json:"itemid"`
+}
+
+func (q *Queries) UpdateItemValorization(ctx context.Context, arg UpdateItemValorizationParams) error {
+	_, err := q.db.ExecContext(ctx, updateItemValorization,
+		arg.Lastprice,
+		arg.Lastcost,
+		arg.Discountraw,
+		arg.Discountpercentual,
+		arg.Updatedat,
+		arg.Itemid,
+	)
+	return err
 }

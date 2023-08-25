@@ -10,20 +10,23 @@ type RepositoryInterface interface {
 }
 
 type ItemsRepositoryInterface interface {
-	FindItem(ctx context.Context, id string) (*entity.Item, error)
+	FindItem(context.Context, string) (*entity.Item, error)
+	FindItemCostHistory(context.Context, string) (*[]entity.ItemValuationLog, error)
+	FindItemPriceHistory(context.Context, string) (*[]entity.ItemValuationLog, error)
+	UpdateItemValuation(context.Context, string, *entity.ItemValuation) error
 	Create(ctx context.Context, login *entity.Item) error
 	RepositoryInterface
 }
 
 type OrdersRepositoryInterface interface {
-	FindOrder(ctx context.Context, id string) (*entity.Order, error)
-	Create(ctx context.Context, order *entity.Order) error
+	FindOrder(context.Context, string) (*entity.Order, error)
+	Create(context.Context, *entity.Order) error
 	RepositoryInterface
 }
 
 type CustomersRepositoryInterface interface {
-	FindCustomerOrders(ctx context.Context, customer string) (*[]entity.Order, error)
-	FindCustomer(ctx context.Context, customer string) (*entity.Customer, error)
-	Create(ctx context.Context, customer *entity.Customer) error
+	FindCustomerOrders(context.Context, string) (*[]entity.Order, error)
+	FindCustomer(context.Context, string) (*entity.Customer, error)
+	Create(context.Context, *entity.Customer) error
 	RepositoryInterface
 }

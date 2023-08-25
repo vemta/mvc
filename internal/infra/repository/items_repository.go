@@ -108,3 +108,14 @@ func (r *ItemRepository) FindItemPriceHistory(ctx context.Context, value string)
 
 	return &log, nil
 }
+
+func (r *ItemRepository) UpdateItemValorization(ctx context.Context, item string, valuation *entity.ItemValuation) error {
+	return r.Queries.UpdateItemValorization(ctx, db.UpdateItemValorizationParams{
+		Lastprice:          valuation.LastPrice,
+		Lastcost:           valuation.LastCost,
+		Discountraw:        valuation.DiscountRaw,
+		Discountpercentual: valuation.DiscountPercentual,
+		Updatedat:          valuation.UpdatedAt,
+		Itemid:             item,
+	})
+}
