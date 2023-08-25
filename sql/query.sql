@@ -67,4 +67,10 @@ INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer
 INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
 INNER JOIN VMT_Orders ON VMT_Orders.ID = VMT_OrderDetails.OrderID
-WHERE VMT_Customers.Email = ? ORDER BY VMT_Orders.ID
+WHERE VMT_Customers.Email = ? ORDER BY VMT_Orders.ID;
+
+-- name: FindCustomer :one
+SELECT * FROM VMT_Customers WHERE Email = ?;
+
+-- name: CreateCustomer :exec
+INSERT INTO VMT_Customers (Email, FullName, Birthdate) VALUES (?,?,?);

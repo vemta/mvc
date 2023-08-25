@@ -10,6 +10,21 @@ import (
 	"time"
 )
 
+const createCustomer = `-- name: CreateCustomer :exec
+INSERT INTO VMT_Customers (Email, FullName, Birthdate) VALUES (?,?,?)
+`
+
+type CreateCustomerParams struct {
+	Email     string    `json:"email"`
+	Fullname  string    `json:"fullname"`
+	Birthdate time.Time `json:"birthdate"`
+}
+
+func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) error {
+	_, err := q.db.ExecContext(ctx, createCustomer, arg.Email, arg.Fullname, arg.Birthdate)
+	return err
+}
+
 const createItem = `-- name: CreateItem :exec
 INSERT INTO VMT_Items (ID, Title, Description, IsGood, CreatedAt) VALUES (?,?,?,?,?)
 `
@@ -31,6 +46,17 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 		arg.Createdat,
 	)
 	return err
+}
+
+const findCustomer = `-- name: FindCustomer :one
+SELECT email, fullname, birthdate FROM VMT_Customers WHERE Email = ?
+`
+
+func (q *Queries) FindCustomer(ctx context.Context, email string) (VmtCustomer, error) {
+	row := q.db.QueryRowContext(ctx, findCustomer, email)
+	var i VmtCustomer
+	err := row.Scan(&i.Email, &i.Fullname, &i.Birthdate)
+	return i, err
 }
 
 const findCustomerOrders = `-- name: FindCustomerOrders :many

@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"github.com/vemta/common/entity"
 	"github.com/vemta/mvc/internal/infra/db"
@@ -80,9 +79,23 @@ func (r *CustomerRepository) FindCustomerOrders(ctx context.Context, customer st
 }
 
 func (r *CustomerRepository) FindCustomer(ctx context.Context, customer string) (*entity.Customer, error) {
-	return nil, errors.New("not implemented yet")
+	found, err := r.Queries.FindCustomer(ctx, customer)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.Customer{
+		Email:     found.Email,
+		FullName:  found.Fullname,
+		Birthdate: found.Birthdate,
+	}, nil
+
 }
 
 func (r *CustomerRepository) Create(ctx context.Context, customer *entity.Customer) error {
-	return errors.New("not implemented yet")
+	return r.Queries.CreateCustomer(ctx, db.CreateCustomerParams{
+		Email:     customer.Email,
+		Fullname:  customer.FullName,
+		Birthdate: customer.Birthdate,
+	})
 }
