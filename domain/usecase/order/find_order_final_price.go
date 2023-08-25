@@ -9,10 +9,6 @@ import (
 	uow "github.com/vemta/mvc/pkg"
 )
 
-type FindOrderFinalPriceUsecaseInput struct {
-	ID string `json:"id"`
-}
-
 type FindOrderFinalPriceUsecase struct {
 	Uow uow.UowInterface
 }
@@ -23,8 +19,8 @@ func NewFindOrderFinalPriceUsecase(uow uow.UowInterface) *FindOrderFinalPriceUse
 	}
 }
 
-func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, input FindOrderFinalPriceUsecaseInput) (float64, error) {
-	order, err := repository.GetOrdersRepository(ctx, u.Uow).FindOrder(ctx, input.ID)
+func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, id string) (float64, error) {
+	order, err := repository.GetOrdersRepository(ctx, u.Uow).FindOrder(ctx, id)
 	if err != nil {
 		return 0, err
 	}
@@ -32,9 +28,7 @@ func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, input FindOrde
 	current := 0.0
 	for _, detail := range *order.Items {
 		uc := usecase.NewFindItemFinalPriceUsecase(u.Uow)
-		price, err := uc.Execute(ctx, usecase.FindItemFinalPriceUsecaseInput{
-			ID: detail.Item.ID,
-		})
+		price, err := uc.Execute(ctx, detail.Item.ID)
 		if err != nil {
 			return 0, err
 		}
