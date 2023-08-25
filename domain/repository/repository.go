@@ -21,7 +21,7 @@ type OrdersRepositoryInterface interface {
 	RepositoryInterface
 }
 
-type CustomersRepository interface {
+type CustomersRepositoryInterface interface {
 	FindCustomerOrders(ctx context.Context, customer string) (*[]entity.Order, error)
 	FindCustomer(ctx context.Context, customer string) (*entity.Customer, error)
 	Create(ctx context.Context, customer *entity.Customer) error

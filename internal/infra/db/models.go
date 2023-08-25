@@ -64,6 +64,12 @@ type VmtItem struct {
 	Description string    `json:"description"`
 	Isgood      bool      `json:"isgood"`
 	Createdat   time.Time `json:"createdat"`
+	Category    int32     `json:"category"`
+}
+
+type VmtItemcategory struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
 }
 
 type VmtItemsvaluation struct {

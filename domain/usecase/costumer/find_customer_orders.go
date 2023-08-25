@@ -2,8 +2,9 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
+	"github.com/vemta/common/entity"
+	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 
@@ -17,6 +18,6 @@ func NewFindCostomerOrdersUsecase(uow uow.UowInterface) *FindCustomerOrdersUseca
 	}
 }
 
-func (u *FindCustomerOrdersUsecase) Execute(ctx context.Context, customer string) (float64, error) {
-	return 0, errors.New("not implemented yet")
+func (u *FindCustomerOrdersUsecase) Execute(ctx context.Context, customer string) (*[]entity.Order, error) {
+	return repository.GetCustomersRepository(ctx, u.Uow).FindCustomerOrders(ctx, customer)
 }

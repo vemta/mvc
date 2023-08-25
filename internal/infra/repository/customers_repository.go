@@ -61,6 +61,10 @@ func (r *CustomerRepository) FindCustomerOrders(ctx context.Context, customer st
 				Title:       order.Itemtitle,
 				IsGood:      order.Itemisgood,
 				Description: order.Itemdescription,
+				Category: &entity.ItemCategory{
+					ID:   int(order.Itemcategoryid),
+					Name: order.Itemcategoryname,
+				},
 				Valuation: &entity.ItemValuation{
 					DiscountRaw:        order.Itemdiscountraw,
 					LastCost:           order.Itemcost,

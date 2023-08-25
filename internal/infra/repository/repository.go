@@ -30,8 +30,8 @@ func GetItemsRepository(ctx context.Context, u uow.UowInterface) repository.Item
 	return getRepository[repository.ItemsRepositoryInterface](ctx, u, "ItemsRepository")
 }
 
-func GetCustomersRepository(ctx context.Context, u uow.UowInterface) repository.ItemsRepositoryInterface {
-	return getRepository[repository.ItemsRepositoryInterface](ctx, u, "CustomersRepository")
+func GetCustomersRepository(ctx context.Context, u uow.UowInterface) repository.CustomersRepositoryInterface {
+	return getRepository[repository.CustomersRepositoryInterface](ctx, u, "CustomersRepository")
 }
 
 func GetOrdersRepository(ctx context.Context, u uow.UowInterface) repository.OrdersRepositoryInterface {

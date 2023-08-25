@@ -76,6 +76,9 @@ VMT_Items.Title ItemTitle,
 VMT_Items.Description ItemDescription,
 VMT_Items.IsGood ItemIsGood,
 VMT_Items.CreatedAt ItemCreatedAt,
+VMT_Items.Category ItemCategory,
+VMT_ItemCategories.ID ItemCategoryId,
+VMT_ItemCategories.Name ItemCategoryName,
 VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
 VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
@@ -84,6 +87,7 @@ VMT_OrderDetails.Quantity DetailQuantity
 FROM VMT_OrderDetails
 INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer 
 INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
+INNER JOIN VMT_ItemCategories ON VMT_ItemCategories.ID = VMTItems.Category
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
 INNER JOIN VMT_Orders ON VMT_Orders.ID = VMT_OrderDetails.OrderID
 WHERE VMT_Customers.Email = ? ORDER BY VMT_Orders.ID
@@ -105,6 +109,9 @@ type FindCustomerOrdersRow struct {
 	Itemdescription        string    `json:"itemdescription"`
 	Itemisgood             bool      `json:"itemisgood"`
 	Itemcreatedat          time.Time `json:"itemcreatedat"`
+	Itemcategory           int32     `json:"itemcategory"`
+	Itemcategoryid         int32     `json:"itemcategoryid"`
+	Itemcategoryname       string    `json:"itemcategoryname"`
 	Itemdiscountraw        float64   `json:"itemdiscountraw"`
 	Itemdiscountpercentual float64   `json:"itemdiscountpercentual"`
 	Itemprice              float64   `json:"itemprice"`
@@ -137,6 +144,9 @@ func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindC
 			&i.Itemdescription,
 			&i.Itemisgood,
 			&i.Itemcreatedat,
+			&i.Itemcategory,
+			&i.Itemcategoryid,
+			&i.Itemcategoryname,
 			&i.Itemdiscountraw,
 			&i.Itemdiscountpercentual,
 			&i.Itemprice,
@@ -157,7 +167,7 @@ func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindC
 }
 
 const findItem = `-- name: FindItem :one
-SELECT id, title, description, isgood, createdat, itemid, lastprice, lastcost, discountraw, discountpercentual, updatedat FROM VMT_Items 
+SELECT id, title, description, isgood, createdat, category, itemid, lastprice, lastcost, discountraw, discountpercentual, updatedat FROM VMT_Items 
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
 WHERE ID = ?
 `
@@ -168,6 +178,7 @@ type FindItemRow struct {
 	Description        string    `json:"description"`
 	Isgood             bool      `json:"isgood"`
 	Createdat          time.Time `json:"createdat"`
+	Category           int32     `json:"category"`
 	Itemid             string    `json:"itemid"`
 	Lastprice          float64   `json:"lastprice"`
 	Lastcost           float64   `json:"lastcost"`
@@ -185,6 +196,7 @@ func (q *Queries) FindItem(ctx context.Context, id string) (FindItemRow, error) 
 		&i.Description,
 		&i.Isgood,
 		&i.Createdat,
+		&i.Category,
 		&i.Itemid,
 		&i.Lastprice,
 		&i.Lastcost,
@@ -275,10 +287,13 @@ VMT_Customers.Email CustomerEmail,
 VMT_Customers.FullName CustomerFullName,
 VMT_Customers.Birthdate CustomerBirthdate,
 VMT_Items.ID ItemID,
+VMT_Items.Category ItemCategory,
 VMT_Items.Title ItemTitle,
 VMT_Items.Description ItemDescription,
 VMT_Items.IsGood ItemIsGood,
 VMT_Items.CreatedAt ItemCreatedAt,
+VMT_ItemCategories.ID ItemCategoryId,
+VMT_ItemCategories.Name ItemCategoryName,
 VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
 VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
@@ -288,6 +303,7 @@ FROM VMT_Orders
 INNER JOIN VMT_Customers on VMT_Customers.Email = VMT_Orders.Customer 
 INNER JOIN VMT_OrderDetails ON VMT_OrderDetails.OrderID = VMT_Orders.ID 
 INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
+INNER JOIN VMT_ItemCategories ON VMT_ItemCategories.ID = VMTItems.Category
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
 WHERE VMT_Orders.ID = ?
 `
@@ -303,10 +319,13 @@ type FindOrderRow struct {
 	Customerfullname        string    `json:"customerfullname"`
 	Customerbirthdate       time.Time `json:"customerbirthdate"`
 	Itemid                  string    `json:"itemid"`
+	Itemcategory            int32     `json:"itemcategory"`
 	Itemtitle               string    `json:"itemtitle"`
 	Itemdescription         string    `json:"itemdescription"`
 	Itemisgood              bool      `json:"itemisgood"`
 	Itemcreatedat           time.Time `json:"itemcreatedat"`
+	Itemcategoryid          int32     `json:"itemcategoryid"`
+	Itemcategoryname        string    `json:"itemcategoryname"`
 	Itemdiscountraw         float64   `json:"itemdiscountraw"`
 	Itemdiscountpercentual  float64   `json:"itemdiscountpercentual"`
 	Itemprice               float64   `json:"itemprice"`
@@ -334,10 +353,13 @@ func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, err
 			&i.Customerfullname,
 			&i.Customerbirthdate,
 			&i.Itemid,
+			&i.Itemcategory,
 			&i.Itemtitle,
 			&i.Itemdescription,
 			&i.Itemisgood,
 			&i.Itemcreatedat,
+			&i.Itemcategoryid,
+			&i.Itemcategoryname,
 			&i.Itemdiscountraw,
 			&i.Itemdiscountpercentual,
 			&i.Itemprice,
