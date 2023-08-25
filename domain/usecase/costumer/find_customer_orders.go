@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
+	"errors"
 
-	"github.com/vemta/mvc/domain/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 
@@ -22,19 +22,5 @@ func NewFindCostomerOrdersUsecase(uow uow.UowInterface) *FindCustomerOrdersUseca
 }
 
 func (u *FindCustomerOrdersUsecase) Execute(ctx context.Context, input FindCustomerOrdersUsecaseInput) (float64, error) {
-	item, err := u.getItemRepository(ctx).FindItem(ctx, input.ID)
-	if err != nil {
-		return 0, err
-	}
-
-	valuation := item.Valuation
-	return (valuation.LastPrice - valuation.DiscountRaw) * (1 - valuation.DiscountPercentual), nil
-}
-
-func (u *FindCustomerOrdersUsecase) getItemRepository(ctx context.Context) repository.ItemRepositoryInterface {
-	itemRepository, err := u.Uow.GetRepository(ctx, "ItemRepository")
-	if err != nil {
-		panic(err)
-	}
-	return itemRepository.(repository.ItemRepositoryInterface)
+	return 0, errors.New("not implemented yet")
 }

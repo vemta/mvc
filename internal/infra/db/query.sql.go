@@ -44,23 +44,46 @@ VMT_Orders.Price OrderPrice,
 VMT_Orders.PaymentMethod PaymentMethod,
 VMT_Orders.Status OrderStatus,
 VMT_Orders.DiscountRaw DiscountRaw,
-VMT_Orders.DiscountPercentual DiscountPercentual
-FROM VMT_Orders
+VMT_Orders.DiscountPercentual DiscountPercentual,
+VMT_Items.ID ItemID,
+VMT_Items.Title ItemTitle,
+VMT_Items.Description ItemDescription,
+VMT_Items.IsGood ItemIsGood,
+VMT_Items.CreatedAt ItemCreatedAt,
+VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
+VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
+VMT_ItemsValuation.LastPrice ItemPrice,
+VMT_ItemsValuation.LastCost ItemCost,
+VMT_OrderDetails.Quantity DetailQuantity
+FROM VMT_OrderDetails
 INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer 
+INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
+INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
+INNER JOIN VMT_Orders ON VMT_Orders.ID = VMT_OrderDetails.OrderID
 WHERE VMT_Customers.Email = ? ORDER BY VMT_Orders.ID
 `
 
 type FindCustomerOrdersRow struct {
-	Orderid            string    `json:"orderid"`
-	Customeremail      string    `json:"customeremail"`
-	Customerfullname   string    `json:"customerfullname"`
-	Customerbirthdate  time.Time `json:"customerbirthdate"`
-	Customer           string    `json:"customer"`
-	Orderprice         float64   `json:"orderprice"`
-	Paymentmethod      int32     `json:"paymentmethod"`
-	Orderstatus        int32     `json:"orderstatus"`
-	Discountraw        float64   `json:"discountraw"`
-	Discountpercentual float64   `json:"discountpercentual"`
+	Orderid                string    `json:"orderid"`
+	Customeremail          string    `json:"customeremail"`
+	Customerfullname       string    `json:"customerfullname"`
+	Customerbirthdate      time.Time `json:"customerbirthdate"`
+	Customer               string    `json:"customer"`
+	Orderprice             float64   `json:"orderprice"`
+	Paymentmethod          int32     `json:"paymentmethod"`
+	Orderstatus            int32     `json:"orderstatus"`
+	Discountraw            float64   `json:"discountraw"`
+	Discountpercentual     float64   `json:"discountpercentual"`
+	Itemid                 string    `json:"itemid"`
+	Itemtitle              string    `json:"itemtitle"`
+	Itemdescription        string    `json:"itemdescription"`
+	Itemisgood             bool      `json:"itemisgood"`
+	Itemcreatedat          time.Time `json:"itemcreatedat"`
+	Itemdiscountraw        float64   `json:"itemdiscountraw"`
+	Itemdiscountpercentual float64   `json:"itemdiscountpercentual"`
+	Itemprice              float64   `json:"itemprice"`
+	Itemcost               float64   `json:"itemcost"`
+	Detailquantity         int32     `json:"detailquantity"`
 }
 
 func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindCustomerOrdersRow, error) {
@@ -83,6 +106,16 @@ func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindC
 			&i.Orderstatus,
 			&i.Discountraw,
 			&i.Discountpercentual,
+			&i.Itemid,
+			&i.Itemtitle,
+			&i.Itemdescription,
+			&i.Itemisgood,
+			&i.Itemcreatedat,
+			&i.Itemdiscountraw,
+			&i.Itemdiscountpercentual,
+			&i.Itemprice,
+			&i.Itemcost,
+			&i.Detailquantity,
 		); err != nil {
 			return nil, err
 		}

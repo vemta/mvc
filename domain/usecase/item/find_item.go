@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/vemta/common/entity"
-	"github.com/vemta/mvc/domain/repository"
+	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 
@@ -23,13 +23,5 @@ func NewItemFindUsecase(uow uow.UowInterface) *ItemFindUsecase {
 }
 
 func (u *ItemFindUsecase) Execute(ctx context.Context, input ItemFindUsecaseInput) (*entity.Item, error) {
-	return u.getItemRepository(ctx).FindItem(ctx, input.ID)
-}
-
-func (u *ItemFindUsecase) getItemRepository(ctx context.Context) repository.ItemRepositoryInterface {
-	itemRepository, err := u.Uow.GetRepository(ctx, "ItemRepository")
-	if err != nil {
-		panic(err)
-	}
-	return itemRepository.(repository.ItemRepositoryInterface)
+	return repository.GetItemsRepository(ctx, u.Uow).FindItem(ctx, input.ID)
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 	"math"
 
-	"github.com/vemta/mvc/domain/repository"
 	usecase "github.com/vemta/mvc/domain/usecase/item"
+	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 
@@ -24,7 +24,7 @@ func NewFindOrderFinalPriceUsecase(uow uow.UowInterface) *FindOrderFinalPriceUse
 }
 
 func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, input FindOrderFinalPriceUsecaseInput) (float64, error) {
-	order, err := u.getOrderRepository(ctx).FindOrder(ctx, input.ID)
+	order, err := repository.GetOrdersRepository(ctx, u.Uow).FindOrder(ctx, input.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -45,13 +45,4 @@ func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, input FindOrde
 	current *= order.DiscountPercentual
 
 	return math.Max(0, current), nil
-
-}
-
-func (u *FindOrderFinalPriceUsecase) getOrderRepository(ctx context.Context) repository.OrderRepositoryInterface {
-	repo, err := u.Uow.GetRepository(ctx, "OrderRepository")
-	if err != nil {
-		panic(err)
-	}
-	return repo.(repository.OrderRepositoryInterface)
 }

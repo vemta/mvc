@@ -51,7 +51,20 @@ VMT_Orders.Price OrderPrice,
 VMT_Orders.PaymentMethod PaymentMethod,
 VMT_Orders.Status OrderStatus,
 VMT_Orders.DiscountRaw DiscountRaw,
-VMT_Orders.DiscountPercentual DiscountPercentual
-FROM VMT_Orders
+VMT_Orders.DiscountPercentual DiscountPercentual,
+VMT_Items.ID ItemID,
+VMT_Items.Title ItemTitle,
+VMT_Items.Description ItemDescription,
+VMT_Items.IsGood ItemIsGood,
+VMT_Items.CreatedAt ItemCreatedAt,
+VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
+VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
+VMT_ItemsValuation.LastPrice ItemPrice,
+VMT_ItemsValuation.LastCost ItemCost,
+VMT_OrderDetails.Quantity DetailQuantity
+FROM VMT_OrderDetails
 INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer 
+INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
+INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
+INNER JOIN VMT_Orders ON VMT_Orders.ID = VMT_OrderDetails.OrderID
 WHERE VMT_Customers.Email = ? ORDER BY VMT_Orders.ID
