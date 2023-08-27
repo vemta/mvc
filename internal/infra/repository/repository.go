@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/vemta/mvc/domain/repository"
+	"github.com/vemta/mvc/internal/domain/repository"
 	"github.com/vemta/mvc/internal/infra/db"
 	uow "github.com/vemta/mvc/pkg"
 )

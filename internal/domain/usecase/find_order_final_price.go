@@ -4,7 +4,6 @@ import (
 	"context"
 	"math"
 
-	usecase "github.com/vemta/mvc/domain/usecase/item"
 	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
@@ -27,7 +26,7 @@ func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, id string) (fl
 
 	current := 0.0
 	for _, detail := range *order.Items {
-		uc := usecase.NewFindItemFinalPriceUsecase(u.Uow)
+		uc := NewFindItemFinalPriceUsecase(u.Uow)
 		price, err := uc.Execute(ctx, detail.Item.ID)
 		if err != nil {
 			return 0, err

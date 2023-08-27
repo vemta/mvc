@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	usecase "github.com/vemta/mvc/domain/usecase/order"
+	usecase "github.com/vemta/mvc/internal/domain/usecase/order"
 	"github.com/vemta/mvc/internal/infra/db"
 	"github.com/vemta/mvc/internal/infra/grpc/pb"
 	uow "github.com/vemta/mvc/pkg"
