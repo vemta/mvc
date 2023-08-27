@@ -96,6 +96,4 @@ services:
     command: >
       bash -c
         "sleep 10s &&
-        kafka-topics --create --topic=createPlugin --if-not-exists --bootstrap-server=broker:29092 &&
-        kafka-topics --create --topic=createUser --if-not-exists --bootstrap-server=broker:29092" &&
-        kafka-topics --create --topic=createRelease --if-not-exists --bootstrap-server=broker:29092"
+        kafka-topics --create --topic=create_order --if-not-exists --bootstrap-server=broker:29092"
