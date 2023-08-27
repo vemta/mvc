@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"database/sql"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/vemta/mvc/internal/infra/kafka/consumer"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/vemta/mvc/internal/infra/db"
@@ -26,6 +28,11 @@ func main() {
 	}
 
 	registerRepositories(uow)
+
+	var topics = []string{"create_order"}
+	msgChan := make(chan *kafka.Message)
+	go consumer.Consume(topics, "host.docker.internal:9094", msgChan)
+	consumer.ProcessEvents(ctx, msgChan, uow)
 
 }
 

@@ -3,6 +3,7 @@ package consumer
 import (
 	"context"
 	"fmt"
+	uow "github.com/vemta/mvc/pkg"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/vemta/mvc/internal/infra/kafka/factory"
