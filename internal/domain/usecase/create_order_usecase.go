@@ -54,6 +54,8 @@ func (u *CreateOrderUsecase) Execute(ctx context.Context, input CreateOrderUseca
 		}
 		current += price * float64(detail.Quantity)
 	}
+	current -= order.DiscountRaw
+	current *= (1 - order.DiscountPercentual)
 	order.Price = current
 
 	return repository.GetOrdersRepository(ctx, u.Uow).Create(ctx, order)

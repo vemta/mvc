@@ -9,20 +9,20 @@ import (
 	uow "github.com/vemta/mvc/pkg"
 )
 
-type orderServiceServer struct {
+type OrderServiceServer struct {
 	pb.UnimplementedOrderServiceServer
 	uow     *uow.UowInterface
 	queries *db.Queries
 }
 
-func NewOrderService(uow *uow.UowInterface, queries *db.Queries) *orderServiceServer {
-	return &orderServiceServer{
+func NewOrderService(uow *uow.UowInterface, queries *db.Queries) *OrderServiceServer {
+	return &OrderServiceServer{
 		uow:     uow,
 		queries: queries,
 	}
 }
 
-func (s *orderServiceServer) GetFinalPrice(ctx context.Context, input *pb.GetFinalPriceRequest) (*pb.GetFinalPriceResponse, error) {
+func (s *OrderServiceServer) GetFinalPrice(ctx context.Context, input *pb.GetFinalPriceRequest) (*pb.GetFinalPriceResponse, error) {
 	uc := usecase.NewFindOrderFinalPriceUsecase(*s.uow)
 	finalPrice, err := uc.Execute(ctx, input.Order)
 	if err != nil {

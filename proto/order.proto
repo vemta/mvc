@@ -23,5 +23,5 @@ message GetFinalPriceResponse {
 }
 
 service OrderService {
-    rpc GetFinalPrice(GetFinalPriceRequest) returns (GetFinalPriceResponse) {}
+    rpc GetOrderPrice(GetFinalPriceRequest) returns (GetFinalPriceResponse) {}
 }
