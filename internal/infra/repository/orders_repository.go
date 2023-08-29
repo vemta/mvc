@@ -34,6 +34,13 @@ func (r *OrderRepository) Create(ctx context.Context, item *entity.Item) error {
 	return err
 }
 
+func (r *OrderRepository) UpdateOrderStatus(ctx context.Context, order string, status int) error {
+	return r.Queries.UpdateOrderStatus(ctx, db.UpdateOrderStatusParams{
+		ID:     order,
+		Status: int32(status),
+	})
+}
+
 func (r *OrderRepository) FindOrder(ctx context.Context, value string) (*entity.Order, error) {
 
 	orderFound, err := r.Queries.FindOrder(ctx, value)

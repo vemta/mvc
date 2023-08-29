@@ -85,5 +85,8 @@ SELECT * FROM VMT_Customers WHERE Email = ?;
 -- name: CreateCustomer :exec
 INSERT INTO VMT_Customers (Email, FullName, Birthdate) VALUES (?,?,?);
 
+-- name: UpdateOrderStatus :exec
+UPDATE VMT_Orders SET Status = ? WHERE ID = ?;
+
 -- name: UpdateItemValorization :exec
 UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, DiscountRaw = ?, DiscountPercentual = ?, UpdatedAt = ? WHERE ItemID = ?;

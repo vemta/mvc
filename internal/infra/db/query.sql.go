@@ -409,3 +409,17 @@ func (q *Queries) UpdateItemValorization(ctx context.Context, arg UpdateItemValo
 	)
 	return err
 }
+
+const updateOrderStatus = `-- name: UpdateOrderStatus :exec
+UPDATE VMT_Orders SET Status = ? WHERE ID = ?
+`
+
+type UpdateOrderStatusParams struct {
+	Status int32  `json:"status"`
+	ID     string `json:"id"`
+}
+
+func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateOrderStatus, arg.Status, arg.ID)
+	return err
+}

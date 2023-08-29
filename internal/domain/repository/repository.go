@@ -21,6 +21,7 @@ type ItemsRepositoryInterface interface {
 type OrdersRepositoryInterface interface {
 	FindOrder(context.Context, string) (*entity.Order, error)
 	FindOrderFinalPrice(context.Context, string) (float64, error)
+	UpdateOrderStatus(context.Context, string, int) error
 	Create(context.Context, *entity.Order) error
 	RepositoryInterface
 }
