@@ -2,20 +2,20 @@ package usecase
 
 import (
 	"context"
+	"errors"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/vemta/common/entity"
+	"github.com/vemta/common/enum"
 	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 
 type CreateOrderUsecaseInput struct {
-	ID                 string               `json:"id"`
-	Customer           string               `json:"customer"`
-	Items              *[]entity.OrderEntry `json:"items"`
-	PaymentMethod      int                  `json:"payment_method"`
-	DiscountRaw        float64              `json:"discount_raw"`
-	DiscountPercentual float64              `json:"discount_percentual"`
-	Status             uint8                `json:"status"`
+	Customer      string               `json:"customer"`
+	Items         *[]entity.OrderEntry `json:"items"`
+	PaymentMethod int                  `json:"payment_method"`
 }
 
 type CreateOrderUsecase struct {
@@ -32,17 +32,25 @@ func (u *CreateOrderUsecase) Execute(ctx context.Context, input CreateOrderUseca
 
 	user, err := repository.GetCustomersRepository(ctx, uow.GetCurrent()).FindCustomer(ctx, input.Customer)
 	if err != nil {
-		return err
+		return errors.New("couldn't find user")
 	}
 
+	if len(*input.Items) <= 0 {
+		return errors.New("cannot create empty order")
+	}
+
+	id := strings.Replace(uuid.New().String(), "-", "", -1)
+
+	// TODO: Implement discount rules
+
 	order := &entity.Order{
-		ID:                 input.ID,
-		Customer:           user,
-		Items:              input.Items,
-		PaymentMethod:      input.PaymentMethod,
-		DiscountRaw:        input.DiscountRaw,
-		DiscountPercentual: input.DiscountPercentual,
-		Status:             input.Status,
+		ID:            id,
+		Customer:      user,
+		Items:         input.Items,
+		PaymentMethod: input.PaymentMethod,
+		// DiscountRaw:        input.DiscountRaw,
+		// DiscountPercentual: input.DiscountPercentual,
+		Status: enum.WaitingPaymentApproval,
 	}
 
 	current := 0.0

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/vemta/mvc/internal/infra/kafka/consumer"
 
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	dtb, err := sql.Open("mysql", "root:root@tcp(mysql:3306)/vertex?parseTime=true")
+	dtb, err := sql.Open("mysql", "root:root@tcp(mysql:3306)/vemta?parseTime=true")
 
 	if err := dtb.Ping(); err != nil {
 		panic(err)

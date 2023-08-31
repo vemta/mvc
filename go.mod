@@ -6,7 +6,8 @@ require github.com/go-sql-driver/mysql v1.7.1
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
-	github.com/vemta/common v1.0.21
+	github.com/google/uuid v1.3.1
+	github.com/vemta/common v1.0.23
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 )
