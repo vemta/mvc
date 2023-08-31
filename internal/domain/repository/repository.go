@@ -38,4 +38,6 @@ type DiscountRulesRepositoryInterface interface {
 	FindOrderDiscountRules(context.Context, string) (*entity.OrderDiscountRule, error)
 	FindValidDiscountRulesForItem(context.Context, string) (*[]entity.ItemDiscountRule, error)
 	FindValidOrderDiscountRules(context.Context) (*[]entity.OrderDiscountRule, error)
+	CreateItemDiscountRule(context.Context, entity.ItemDiscountRule) error
+	CreateOrderDiscountRule(context.Context, entity.OrderDiscountRule) error
 }

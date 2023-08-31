@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/vemta/common/entity"
+	"github.com/vemta/common/enum/orderstatus"
 	"github.com/vemta/mvc/internal/infra/db"
 )
 
@@ -63,7 +64,7 @@ func (r *OrderRepository) FindOrder(ctx context.Context, value string) (*entity.
 		order.ID = entry.Orderid
 		order.DiscountRaw = entry.Orderdiscountraw
 		order.Price = entry.Orderprice
-		order.Status = uint8(entry.Orderstatus)
+		order.Status = orderstatus.OrderStatus(uint8(entry.Orderstatus))
 		order.PaymentMethod = int(entry.Orderpaymentmethod)
 
 		details = append(details, entity.OrderEntry{
