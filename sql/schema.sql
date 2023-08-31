@@ -11,7 +11,7 @@ CREATE TABLE VMT_CustomerCart (
 	Customer VARCHAR(64) NOT NULL,
 	Item VARCHAR(64) NOT NULL,
 	Quantity INT NOT NULL
-)
+);
 
 CREATE TABLE VMT_Customers (
 	Email VARCHAR(64) PRIMARY KEY NOT NULL,
@@ -59,7 +59,29 @@ CREATE TABLE VMT_ItemValuationLog (
 	Item VARCHAR(64) NOT NULL,
 	Price DECIMAL(10,2) NOT NULL,
 	ValuationType ENUM("Price", "Cost") NOT NULL,
-	ValorizatedAt DATETIME NOT NULL,
+	ValorizatedAt DATETIME NOT NULL
+);
+
+CREATE TABLE VMT_OrderDiscountRules (
+	ID VARCHAR(64) PRIMARY KEY NOT NULL,
+	Name VARCHAR(128) NOT NULL,
 	DiscountRaw DECIMAL(10,2) NOT NULL,
-	DiscountPercentual DECIMAL(10,2) NOT NULL
+	DiscountPercentual DECIMAL(10,2) NOT NULL,
+	ApplyFirst ENUM('RAW', 'PERCENTUAL') NOT NULL,
+	ValidFrom DATETIME NOT NULL,
+	ValidUntil DATETIME,
+	AboveValue DECIMAL(10,2) NOT NULL,
+	BellowValue DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE VMT_ItemDiscountRules (
+	ID VARCHAR(64) PRIMARY KEY NOT NULL,
+	Name VARCHAR(128) NOT NULL,
+	DiscountRaw DECIMAL(10,2) NOT NULL,
+	DiscountPercentual DECIMAL(10,2) NOT NULL,
+	ApplyFirst ENUM('RAW', 'PERCENTUAL') NOT NULL,
+	ValidFrom DATETIME NOT NULL,
+	ValidUntil DATETIME,
+	AboveValue DECIMAL(10,2) NOT NULL,
+	BellowValue DECIMAL(10,2) NOT NULL
 );

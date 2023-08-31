@@ -6,37 +6,33 @@ import (
 	"github.com/vemta/common/entity"
 )
 
-type OrderDiscountRuleParams struct {
-	AboveValue  float64
-	BellowValue float64
-	AfterDate   time.Time
-	BeforeDate  time.Time
-}
-
 type OrderDiscountRule struct {
 	ID                 string
 	Name               string
 	DiscountRaw        float64
 	DiscountPercentual float64
 	ApplyFirst         string // raw | percentual
-	Params             OrderDiscountRuleParams
+	AboveValue         float64
+	BellowValue        float64
+	ValidFrom          time.Time
+	ValidUntil         time.Time
 }
 
 func (d *OrderDiscountRule) TryApply(order *entity.Order) (bool, float64) {
 
-	if order.Price < d.Params.AboveValue && d.Params.AboveValue != -1 {
+	if order.Price < d.AboveValue && d.AboveValue != -1 {
 		return false, order.Price
 	}
 
-	if order.Price > d.Params.BellowValue && d.Params.BellowValue != -1 {
+	if order.Price > d.BellowValue && d.BellowValue != -1 {
 		return false, order.Price
 	}
 
-	if !d.Params.AfterDate.IsZero() && !time.Now().After(d.Params.AfterDate) {
+	if !d.ValidFrom.IsZero() && !time.Now().After(d.ValidFrom) {
 		return false, order.Price
 	}
 
-	if !d.Params.BeforeDate.IsZero() && !time.Now().Before(d.Params.BeforeDate) {
+	if !d.ValidUntil.IsZero() && !time.Now().Before(d.ValidUntil) {
 		return false, order.Price
 	}
 

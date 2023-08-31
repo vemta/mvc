@@ -5,10 +5,53 @@
 package db
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"fmt"
 	"time"
 )
+
+type VmtItemdiscountrulesApplyfirst string
+
+const (
+	VmtItemdiscountrulesApplyfirstRAW        VmtItemdiscountrulesApplyfirst = "RAW"
+	VmtItemdiscountrulesApplyfirstPERCENTUAL VmtItemdiscountrulesApplyfirst = "PERCENTUAL"
+)
+
+func (e *VmtItemdiscountrulesApplyfirst) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = VmtItemdiscountrulesApplyfirst(s)
+	case string:
+		*e = VmtItemdiscountrulesApplyfirst(s)
+	default:
+		return fmt.Errorf("unsupported scan type for VmtItemdiscountrulesApplyfirst: %T", src)
+	}
+	return nil
+}
+
+type NullVmtItemdiscountrulesApplyfirst struct {
+	VmtItemdiscountrulesApplyfirst VmtItemdiscountrulesApplyfirst `json:"vmt_itemdiscountrules_applyfirst"`
+	Valid                          bool                           `json:"valid"` // Valid is true if VmtItemdiscountrulesApplyfirst is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullVmtItemdiscountrulesApplyfirst) Scan(value interface{}) error {
+	if value == nil {
+		ns.VmtItemdiscountrulesApplyfirst, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.VmtItemdiscountrulesApplyfirst.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullVmtItemdiscountrulesApplyfirst) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.VmtItemdiscountrulesApplyfirst), nil
+}
 
 type VmtItemvaluationlogValuationtype string
 
@@ -52,10 +95,58 @@ func (ns NullVmtItemvaluationlogValuationtype) Value() (driver.Value, error) {
 	return string(ns.VmtItemvaluationlogValuationtype), nil
 }
 
+type VmtOrderdiscountrulesApplyfirst string
+
+const (
+	VmtOrderdiscountrulesApplyfirstRAW        VmtOrderdiscountrulesApplyfirst = "RAW"
+	VmtOrderdiscountrulesApplyfirstPERCENTUAL VmtOrderdiscountrulesApplyfirst = "PERCENTUAL"
+)
+
+func (e *VmtOrderdiscountrulesApplyfirst) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = VmtOrderdiscountrulesApplyfirst(s)
+	case string:
+		*e = VmtOrderdiscountrulesApplyfirst(s)
+	default:
+		return fmt.Errorf("unsupported scan type for VmtOrderdiscountrulesApplyfirst: %T", src)
+	}
+	return nil
+}
+
+type NullVmtOrderdiscountrulesApplyfirst struct {
+	VmtOrderdiscountrulesApplyfirst VmtOrderdiscountrulesApplyfirst `json:"vmt_orderdiscountrules_applyfirst"`
+	Valid                           bool                            `json:"valid"` // Valid is true if VmtOrderdiscountrulesApplyfirst is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullVmtOrderdiscountrulesApplyfirst) Scan(value interface{}) error {
+	if value == nil {
+		ns.VmtOrderdiscountrulesApplyfirst, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.VmtOrderdiscountrulesApplyfirst.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullVmtOrderdiscountrulesApplyfirst) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.VmtOrderdiscountrulesApplyfirst), nil
+}
+
 type VmtCustomer struct {
 	Email     string    `json:"email"`
 	Fullname  string    `json:"fullname"`
 	Birthdate time.Time `json:"birthdate"`
+}
+
+type VmtCustomercart struct {
+	Customer string `json:"customer"`
+	Item     string `json:"item"`
+	Quantity int32  `json:"quantity"`
 }
 
 type VmtItem struct {
@@ -72,6 +163,22 @@ type VmtItemcategory struct {
 	Name string `json:"name"`
 }
 
+type VmtItemdiscountrule struct {
+	ID                 string                         `json:"id"`
+	Name               string                         `json:"name"`
+	Discountraw        float64                        `json:"discountraw"`
+	Discountpercentual float64                        `json:"discountpercentual"`
+	Applyfirst         VmtItemdiscountrulesApplyfirst `json:"applyfirst"`
+	Validfrom          time.Time                      `json:"validfrom"`
+	Validuntil         sql.NullTime                   `json:"validuntil"`
+}
+
+type VmtItemdiscountrulesparam struct {
+	Discountrule string  `json:"discountrule"`
+	Abovevalue   float64 `json:"abovevalue"`
+	Bellowvalue  float64 `json:"bellowvalue"`
+}
+
 type VmtItemsvaluation struct {
 	Itemid             string    `json:"itemid"`
 	Lastprice          float64   `json:"lastprice"`
@@ -82,12 +189,10 @@ type VmtItemsvaluation struct {
 }
 
 type VmtItemvaluationlog struct {
-	Item               string                           `json:"item"`
-	Price              float64                          `json:"price"`
-	Valuationtype      VmtItemvaluationlogValuationtype `json:"valuationtype"`
-	Valorizatedat      time.Time                        `json:"valorizatedat"`
-	Discountraw        float64                          `json:"discountraw"`
-	Discountpercentual float64                          `json:"discountpercentual"`
+	Item          string                           `json:"item"`
+	Price         float64                          `json:"price"`
+	Valuationtype VmtItemvaluationlogValuationtype `json:"valuationtype"`
+	Valorizatedat time.Time                        `json:"valorizatedat"`
 }
 
 type VmtOrder struct {
@@ -104,6 +209,22 @@ type VmtOrderdetail struct {
 	Orderid  string `json:"orderid"`
 	Item     string `json:"item"`
 	Quantity int32  `json:"quantity"`
+}
+
+type VmtOrderdiscountrule struct {
+	ID                 string                          `json:"id"`
+	Name               string                          `json:"name"`
+	Discountraw        float64                         `json:"discountraw"`
+	Discountpercentual float64                         `json:"discountpercentual"`
+	Applyfirst         VmtOrderdiscountrulesApplyfirst `json:"applyfirst"`
+	Validfrom          time.Time                       `json:"validfrom"`
+	Validuntil         sql.NullTime                    `json:"validuntil"`
+}
+
+type VmtOrderdiscountrulesparam struct {
+	Discountrule string  `json:"discountrule"`
+	Abovevalue   float64 `json:"abovevalue"`
+	Bellowvalue  float64 `json:"bellowvalue"`
 }
 
 type VmtSystemoption struct {

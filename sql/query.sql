@@ -90,3 +90,7 @@ UPDATE VMT_Orders SET Status = ? WHERE ID = ?;
 
 -- name: UpdateItemValorization :exec
 UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, DiscountRaw = ?, DiscountPercentual = ?, UpdatedAt = ? WHERE ItemID = ?;
+
+-- name: FindValidOrderDiscountRules :many
+SELECT * FROM VMT_OrderDiscountRules
+WHERE ValidFrom >= ? AND ValidUntil <= ?;
