@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/vemta/common/entity"
+	"github.com/vemta/common/enum/orderstatus"
 	"github.com/vemta/mvc/internal/infra/db"
 )
 
@@ -47,7 +48,7 @@ func (r *CustomerRepository) FindCustomerOrders(ctx context.Context, customer st
 			currentOrder.DiscountPercentual = order.Discountpercentual
 			currentOrder.PaymentMethod = int(order.Paymentmethod)
 			currentOrder.Price = order.Orderprice
-			currentOrder.Status = uint8(order.Orderstatus)
+			currentOrder.Status = orderstatus.OrderStatus((order.Orderstatus))
 			currentOrder.Customer = &entity.Customer{
 				Email:     order.Customeremail,
 				FullName:  order.Customerfullname,

@@ -78,10 +78,8 @@ func (r *ItemRepository) FindItemCostHistory(ctx context.Context, value string) 
 
 	for _, entry := range logs {
 		log = append(log, entity.ItemValuationLog{
-			Value:              entry.Price,
-			DiscountRaw:        entry.Discountraw,
-			DiscountPercentual: entry.Discountpercentual,
-			UpdatedAt:          entry.Valorizatedat,
+			Value:     entry.Price,
+			UpdatedAt: entry.Valorizatedat,
 		})
 	}
 
@@ -99,10 +97,8 @@ func (r *ItemRepository) FindItemPriceHistory(ctx context.Context, value string)
 
 	for _, entry := range logs {
 		log = append(log, entity.ItemValuationLog{
-			Value:              entry.Price,
-			DiscountRaw:        entry.Discountraw,
-			DiscountPercentual: entry.Discountpercentual,
-			UpdatedAt:          entry.Valorizatedat,
+			Value:     entry.Price,
+			UpdatedAt: entry.Valorizatedat,
 		})
 	}
 

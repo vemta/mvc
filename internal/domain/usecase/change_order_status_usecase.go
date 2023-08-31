@@ -3,14 +3,14 @@ package usecase
 import (
 	"context"
 
-	"github.com/vemta/common/enum"
+	"github.com/vemta/common/enum/orderstatus"
 	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
 
 type UpdateOrderStatusUsecaseInput struct {
-	Order  string           `json:"order"`
-	Status enum.OrderStatus `json:"status"`
+	Order  string                  `json:"order"`
+	Status orderstatus.OrderStatus `json:"status"`
 }
 
 type UpdateOrderStatusUsecase struct {

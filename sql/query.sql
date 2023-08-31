@@ -12,8 +12,6 @@ VMT_Orders.ID OrderID,
 VMT_Orders.Price OrderPrice,
 VMT_Orders.PaymentMethod OrderPaymentMethod,
 VMT_Orders.Status OrderStatus,
-VMT_Orders.DiscountRaw OrderDiscountRaw,
-VMT_Orders.DiscountPercentual OrderDiscountPercentual,
 VMT_Customers.Email CustomerEmail,
 VMT_Customers.FullName CustomerFullName,
 VMT_Customers.Birthdate CustomerBirthdate,
@@ -25,8 +23,6 @@ VMT_Items.IsGood ItemIsGood,
 VMT_Items.CreatedAt ItemCreatedAt,
 VMT_ItemCategories.ID ItemCategoryId,
 VMT_ItemCategories.Name ItemCategoryName,
-VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
-VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
 VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
@@ -55,8 +51,6 @@ VMT_Orders.Customer Customer,
 VMT_Orders.Price OrderPrice,
 VMT_Orders.PaymentMethod PaymentMethod,
 VMT_Orders.Status OrderStatus,
-VMT_Orders.DiscountRaw DiscountRaw,
-VMT_Orders.DiscountPercentual DiscountPercentual,
 VMT_Items.ID ItemID,
 VMT_Items.Title ItemTitle,
 VMT_Items.Description ItemDescription,
@@ -65,8 +59,6 @@ VMT_Items.CreatedAt ItemCreatedAt,
 VMT_Items.Category ItemCategory,
 VMT_ItemCategories.ID ItemCategoryId,
 VMT_ItemCategories.Name ItemCategoryName,
-VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
-VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
 VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
@@ -99,3 +91,11 @@ WHERE ValidFrom >= ? AND ValidUntil <= ?;
 SELECT * FROM VMT_ItemsOfDiscountRule
 INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
 WHERE DiscountRule = ?;
+
+-- name: FindOrderDiscountRule :one
+SELECT * FROM VMT_OrderDiscountRules WHERE ID = ?;
+
+-- name: FindAvailableDiscountRulesForItem :many
+SELECT * FROM VMT_ItemsOfDiscountRule 
+INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
+WHERE VMT_ItemsOfDiscountRule.Item = ?

@@ -25,8 +25,6 @@ CREATE TABLE VMT_Orders (
 	Price              DECIMAL(10,2) NOT NULL,
 	PaymentMethod      INT NOT NULL,
     Status             INT NOT NULL,
-	DiscountRaw        DECIMAL(10,2) NOT NULL,
-	DiscountPercentual DECIMAL(10,2) NOT NULL
 );
 
 CREATE TABLE VMT_OrderDetails (
@@ -50,8 +48,6 @@ CREATE TABLE VMT_ItemsValuation (
 	ItemID VARCHAR(64) PRIMARY KEY NOT NULL,
 	LastPrice DECIMAL(10,2) NOT NULL,
 	LastCost DECIMAL(10,2) NOT NULL,
-	DiscountRaw DECIMAL(10,2) NOT NULL,
-	DiscountPercentual DECIMAL(10,2) NOT NULL,
 	UpdatedAt DATETIME NOT NULL
 );
 

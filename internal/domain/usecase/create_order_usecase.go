@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/vemta/common/entity"
-	"github.com/vemta/common/enum"
+	"github.com/vemta/common/enum/orderstatus"
 	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
@@ -50,7 +50,7 @@ func (u *CreateOrderUsecase) Execute(ctx context.Context, input CreateOrderUseca
 		PaymentMethod: input.PaymentMethod,
 		// DiscountRaw:        input.DiscountRaw,
 		// DiscountPercentual: input.DiscountPercentual,
-		Status: enum.WaitingPaymentApproval,
+		Status: orderstatus.WaitingPaymentApproval,
 	}
 
 	current := 0.0

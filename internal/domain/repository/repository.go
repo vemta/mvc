@@ -32,3 +32,10 @@ type CustomersRepositoryInterface interface {
 	Create(context.Context, *entity.Customer) error
 	RepositoryInterface
 }
+
+type DiscountRulesRepositoryInterface interface {
+	FindItemDiscountRules(context.Context, string) (*entity.ItemDiscountRule, error)
+	FindOrderDiscountRules(context.Context, string) (*entity.OrderDiscountRule, error)
+	FindValidDiscountRulesForItem(context.Context, string) (*[]entity.ItemDiscountRule, error)
+	FindValidOrderDiscountRules(context.Context) (*[]entity.OrderDiscountRule, error)
+}

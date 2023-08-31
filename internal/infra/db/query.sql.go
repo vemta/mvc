@@ -49,6 +49,61 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 	return err
 }
 
+const findAvailableDiscountRulesForItem = `-- name: FindAvailableDiscountRulesForItem :many
+SELECT discountrule, item, id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue FROM VMT_ItemsOfDiscountRule 
+INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
+WHERE VMT_ItemsOfDiscountRule.Item = ?
+`
+
+type FindAvailableDiscountRulesForItemRow struct {
+	Discountrule       string                         `json:"discountrule"`
+	Item               string                         `json:"item"`
+	ID                 string                         `json:"id"`
+	Name               string                         `json:"name"`
+	Discountraw        float64                        `json:"discountraw"`
+	Discountpercentual float64                        `json:"discountpercentual"`
+	Applyfirst         VmtItemdiscountrulesApplyfirst `json:"applyfirst"`
+	Validfrom          time.Time                      `json:"validfrom"`
+	Validuntil         sql.NullTime                   `json:"validuntil"`
+	Abovevalue         float64                        `json:"abovevalue"`
+	Bellowvalue        float64                        `json:"bellowvalue"`
+}
+
+func (q *Queries) FindAvailableDiscountRulesForItem(ctx context.Context, item string) ([]FindAvailableDiscountRulesForItemRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAvailableDiscountRulesForItem, item)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindAvailableDiscountRulesForItemRow
+	for rows.Next() {
+		var i FindAvailableDiscountRulesForItemRow
+		if err := rows.Scan(
+			&i.Discountrule,
+			&i.Item,
+			&i.ID,
+			&i.Name,
+			&i.Discountraw,
+			&i.Discountpercentual,
+			&i.Applyfirst,
+			&i.Validfrom,
+			&i.Validuntil,
+			&i.Abovevalue,
+			&i.Bellowvalue,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findCustomer = `-- name: FindCustomer :one
 SELECT email, fullname, birthdate FROM VMT_Customers WHERE Email = ?
 `
@@ -435,6 +490,27 @@ func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, err
 		return nil, err
 	}
 	return items, nil
+}
+
+const findOrderDiscountRule = `-- name: FindOrderDiscountRule :one
+SELECT id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue FROM VMT_OrderDiscountRules WHERE ID = ?
+`
+
+func (q *Queries) FindOrderDiscountRule(ctx context.Context, id string) (VmtOrderdiscountrule, error) {
+	row := q.db.QueryRowContext(ctx, findOrderDiscountRule, id)
+	var i VmtOrderdiscountrule
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Discountraw,
+		&i.Discountpercentual,
+		&i.Applyfirst,
+		&i.Validfrom,
+		&i.Validuntil,
+		&i.Abovevalue,
+		&i.Bellowvalue,
+	)
+	return i, err
 }
 
 const findValidOrderDiscountRules = `-- name: FindValidOrderDiscountRules :many
