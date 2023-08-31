@@ -171,12 +171,13 @@ type VmtItemdiscountrule struct {
 	Applyfirst         VmtItemdiscountrulesApplyfirst `json:"applyfirst"`
 	Validfrom          time.Time                      `json:"validfrom"`
 	Validuntil         sql.NullTime                   `json:"validuntil"`
+	Abovevalue         float64                        `json:"abovevalue"`
+	Bellowvalue        float64                        `json:"bellowvalue"`
 }
 
-type VmtItemdiscountrulesparam struct {
-	Discountrule string  `json:"discountrule"`
-	Abovevalue   float64 `json:"abovevalue"`
-	Bellowvalue  float64 `json:"bellowvalue"`
+type VmtItemsofdiscountrule struct {
+	Discountrule string `json:"discountrule"`
+	Item         string `json:"item"`
 }
 
 type VmtItemsvaluation struct {
@@ -219,12 +220,8 @@ type VmtOrderdiscountrule struct {
 	Applyfirst         VmtOrderdiscountrulesApplyfirst `json:"applyfirst"`
 	Validfrom          time.Time                       `json:"validfrom"`
 	Validuntil         sql.NullTime                    `json:"validuntil"`
-}
-
-type VmtOrderdiscountrulesparam struct {
-	Discountrule string  `json:"discountrule"`
-	Abovevalue   float64 `json:"abovevalue"`
-	Bellowvalue  float64 `json:"bellowvalue"`
+	Abovevalue         float64                         `json:"abovevalue"`
+	Bellowvalue        float64                         `json:"bellowvalue"`
 }
 
 type VmtSystemoption struct {

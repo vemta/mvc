@@ -94,3 +94,8 @@ UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, DiscountRaw = ?, Disc
 -- name: FindValidOrderDiscountRules :many
 SELECT * FROM VMT_OrderDiscountRules
 WHERE ValidFrom >= ? AND ValidUntil <= ?;
+
+-- name: FindItemDiscountRule :many
+SELECT * FROM VMT_ItemsOfDiscountRule
+INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
+WHERE DiscountRule = ?;

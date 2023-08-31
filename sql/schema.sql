@@ -85,3 +85,10 @@ CREATE TABLE VMT_ItemDiscountRules (
 	AboveValue DECIMAL(10,2) NOT NULL,
 	BellowValue DECIMAL(10,2) NOT NULL
 );
+
+CREATE TABLE VMT_ItemsOfDiscountRule (
+	DiscountRule VARCHAR(64) NOT NULL,
+	Item VARCHAR(64) NOT NULL,
+
+	PRIMARY KEY (DiscountRule, Item)
+);
