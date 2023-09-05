@@ -125,8 +125,6 @@ VMT_Orders.Customer Customer,
 VMT_Orders.Price OrderPrice,
 VMT_Orders.PaymentMethod PaymentMethod,
 VMT_Orders.Status OrderStatus,
-VMT_Orders.DiscountRaw DiscountRaw,
-VMT_Orders.DiscountPercentual DiscountPercentual,
 VMT_Items.ID ItemID,
 VMT_Items.Title ItemTitle,
 VMT_Items.Description ItemDescription,
@@ -135,8 +133,6 @@ VMT_Items.CreatedAt ItemCreatedAt,
 VMT_Items.Category ItemCategory,
 VMT_ItemCategories.ID ItemCategoryId,
 VMT_ItemCategories.Name ItemCategoryName,
-VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
-VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
 VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
@@ -151,30 +147,26 @@ WHERE VMT_Customers.Email = ? ORDER BY VMT_Orders.ID
 `
 
 type FindCustomerOrdersRow struct {
-	Orderid                string    `json:"orderid"`
-	Customeremail          string    `json:"customeremail"`
-	Customerfullname       string    `json:"customerfullname"`
-	Customerbirthdate      time.Time `json:"customerbirthdate"`
-	Customer               string    `json:"customer"`
-	Orderprice             float64   `json:"orderprice"`
-	Paymentmethod          int32     `json:"paymentmethod"`
-	Orderstatus            int32     `json:"orderstatus"`
-	Discountraw            float64   `json:"discountraw"`
-	Discountpercentual     float64   `json:"discountpercentual"`
-	Itemid                 string    `json:"itemid"`
-	Itemtitle              string    `json:"itemtitle"`
-	Itemdescription        string    `json:"itemdescription"`
-	Itemisgood             bool      `json:"itemisgood"`
-	Itemcreatedat          time.Time `json:"itemcreatedat"`
-	Itemcategory           int32     `json:"itemcategory"`
-	Itemcategoryid         int32     `json:"itemcategoryid"`
-	Itemcategoryname       string    `json:"itemcategoryname"`
-	Itemdiscountraw        float64   `json:"itemdiscountraw"`
-	Itemdiscountpercentual float64   `json:"itemdiscountpercentual"`
-	Itemprice              float64   `json:"itemprice"`
-	Itemcost               float64   `json:"itemcost"`
-	Valuationupdatedat     time.Time `json:"valuationupdatedat"`
-	Detailquantity         int32     `json:"detailquantity"`
+	Orderid            string    `json:"orderid"`
+	Customeremail      string    `json:"customeremail"`
+	Customerfullname   string    `json:"customerfullname"`
+	Customerbirthdate  time.Time `json:"customerbirthdate"`
+	Customer           string    `json:"customer"`
+	Orderprice         float64   `json:"orderprice"`
+	Paymentmethod      int32     `json:"paymentmethod"`
+	Orderstatus        int32     `json:"orderstatus"`
+	Itemid             string    `json:"itemid"`
+	Itemtitle          string    `json:"itemtitle"`
+	Itemdescription    string    `json:"itemdescription"`
+	Itemisgood         bool      `json:"itemisgood"`
+	Itemcreatedat      time.Time `json:"itemcreatedat"`
+	Itemcategory       int32     `json:"itemcategory"`
+	Itemcategoryid     int32     `json:"itemcategoryid"`
+	Itemcategoryname   string    `json:"itemcategoryname"`
+	Itemprice          float64   `json:"itemprice"`
+	Itemcost           float64   `json:"itemcost"`
+	Valuationupdatedat time.Time `json:"valuationupdatedat"`
+	Detailquantity     int32     `json:"detailquantity"`
 }
 
 func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindCustomerOrdersRow, error) {
@@ -195,8 +187,6 @@ func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindC
 			&i.Orderprice,
 			&i.Paymentmethod,
 			&i.Orderstatus,
-			&i.Discountraw,
-			&i.Discountpercentual,
 			&i.Itemid,
 			&i.Itemtitle,
 			&i.Itemdescription,
@@ -205,8 +195,6 @@ func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindC
 			&i.Itemcategory,
 			&i.Itemcategoryid,
 			&i.Itemcategoryname,
-			&i.Itemdiscountraw,
-			&i.Itemdiscountpercentual,
 			&i.Itemprice,
 			&i.Itemcost,
 			&i.Valuationupdatedat,
@@ -226,24 +214,22 @@ func (q *Queries) FindCustomerOrders(ctx context.Context, email string) ([]FindC
 }
 
 const findItem = `-- name: FindItem :one
-SELECT id, title, description, isgood, createdat, category, itemid, lastprice, lastcost, discountraw, discountpercentual, updatedat FROM VMT_Items 
+SELECT id, title, description, isgood, createdat, category, itemid, lastprice, lastcost, updatedat FROM VMT_Items 
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_Items.ID
 WHERE ID = ?
 `
 
 type FindItemRow struct {
-	ID                 string    `json:"id"`
-	Title              string    `json:"title"`
-	Description        string    `json:"description"`
-	Isgood             bool      `json:"isgood"`
-	Createdat          time.Time `json:"createdat"`
-	Category           int32     `json:"category"`
-	Itemid             string    `json:"itemid"`
-	Lastprice          float64   `json:"lastprice"`
-	Lastcost           float64   `json:"lastcost"`
-	Discountraw        float64   `json:"discountraw"`
-	Discountpercentual float64   `json:"discountpercentual"`
-	Updatedat          time.Time `json:"updatedat"`
+	ID          string    `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Isgood      bool      `json:"isgood"`
+	Createdat   time.Time `json:"createdat"`
+	Category    int32     `json:"category"`
+	Itemid      string    `json:"itemid"`
+	Lastprice   float64   `json:"lastprice"`
+	Lastcost    float64   `json:"lastcost"`
+	Updatedat   time.Time `json:"updatedat"`
 }
 
 func (q *Queries) FindItem(ctx context.Context, id string) (FindItemRow, error) {
@@ -259,8 +245,6 @@ func (q *Queries) FindItem(ctx context.Context, id string) (FindItemRow, error) 
 		&i.Itemid,
 		&i.Lastprice,
 		&i.Lastcost,
-		&i.Discountraw,
-		&i.Discountpercentual,
 		&i.Updatedat,
 	)
 	return i, err
@@ -391,8 +375,6 @@ VMT_Orders.ID OrderID,
 VMT_Orders.Price OrderPrice,
 VMT_Orders.PaymentMethod OrderPaymentMethod,
 VMT_Orders.Status OrderStatus,
-VMT_Orders.DiscountRaw OrderDiscountRaw,
-VMT_Orders.DiscountPercentual OrderDiscountPercentual,
 VMT_Customers.Email CustomerEmail,
 VMT_Customers.FullName CustomerFullName,
 VMT_Customers.Birthdate CustomerBirthdate,
@@ -404,8 +386,6 @@ VMT_Items.IsGood ItemIsGood,
 VMT_Items.CreatedAt ItemCreatedAt,
 VMT_ItemCategories.ID ItemCategoryId,
 VMT_ItemCategories.Name ItemCategoryName,
-VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
-VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
 VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
@@ -420,29 +400,25 @@ WHERE VMT_Orders.ID = ?
 `
 
 type FindOrderRow struct {
-	Orderid                 string    `json:"orderid"`
-	Orderprice              float64   `json:"orderprice"`
-	Orderpaymentmethod      int32     `json:"orderpaymentmethod"`
-	Orderstatus             int32     `json:"orderstatus"`
-	Orderdiscountraw        float64   `json:"orderdiscountraw"`
-	Orderdiscountpercentual float64   `json:"orderdiscountpercentual"`
-	Customeremail           string    `json:"customeremail"`
-	Customerfullname        string    `json:"customerfullname"`
-	Customerbirthdate       time.Time `json:"customerbirthdate"`
-	Itemid                  string    `json:"itemid"`
-	Itemcategory            int32     `json:"itemcategory"`
-	Itemtitle               string    `json:"itemtitle"`
-	Itemdescription         string    `json:"itemdescription"`
-	Itemisgood              bool      `json:"itemisgood"`
-	Itemcreatedat           time.Time `json:"itemcreatedat"`
-	Itemcategoryid          int32     `json:"itemcategoryid"`
-	Itemcategoryname        string    `json:"itemcategoryname"`
-	Itemdiscountraw         float64   `json:"itemdiscountraw"`
-	Itemdiscountpercentual  float64   `json:"itemdiscountpercentual"`
-	Itemprice               float64   `json:"itemprice"`
-	Itemcost                float64   `json:"itemcost"`
-	Valuationupdatedat      time.Time `json:"valuationupdatedat"`
-	Detailquantity          int32     `json:"detailquantity"`
+	Orderid            string    `json:"orderid"`
+	Orderprice         float64   `json:"orderprice"`
+	Orderpaymentmethod int32     `json:"orderpaymentmethod"`
+	Orderstatus        int32     `json:"orderstatus"`
+	Customeremail      string    `json:"customeremail"`
+	Customerfullname   string    `json:"customerfullname"`
+	Customerbirthdate  time.Time `json:"customerbirthdate"`
+	Itemid             string    `json:"itemid"`
+	Itemcategory       int32     `json:"itemcategory"`
+	Itemtitle          string    `json:"itemtitle"`
+	Itemdescription    string    `json:"itemdescription"`
+	Itemisgood         bool      `json:"itemisgood"`
+	Itemcreatedat      time.Time `json:"itemcreatedat"`
+	Itemcategoryid     int32     `json:"itemcategoryid"`
+	Itemcategoryname   string    `json:"itemcategoryname"`
+	Itemprice          float64   `json:"itemprice"`
+	Itemcost           float64   `json:"itemcost"`
+	Valuationupdatedat time.Time `json:"valuationupdatedat"`
+	Detailquantity     int32     `json:"detailquantity"`
 }
 
 func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, error) {
@@ -459,8 +435,6 @@ func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, err
 			&i.Orderprice,
 			&i.Orderpaymentmethod,
 			&i.Orderstatus,
-			&i.Orderdiscountraw,
-			&i.Orderdiscountpercentual,
 			&i.Customeremail,
 			&i.Customerfullname,
 			&i.Customerbirthdate,
@@ -472,8 +446,6 @@ func (q *Queries) FindOrder(ctx context.Context, id string) ([]FindOrderRow, err
 			&i.Itemcreatedat,
 			&i.Itemcategoryid,
 			&i.Itemcategoryname,
-			&i.Itemdiscountraw,
-			&i.Itemdiscountpercentual,
 			&i.Itemprice,
 			&i.Itemcost,
 			&i.Valuationupdatedat,
@@ -515,7 +487,7 @@ func (q *Queries) FindOrderDiscountRule(ctx context.Context, id string) (VmtOrde
 
 const findValidOrderDiscountRules = `-- name: FindValidOrderDiscountRules :many
 SELECT id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue FROM VMT_OrderDiscountRules
-WHERE ValidFrom >= ? AND ValidUntil <= ?
+WHERE ValidFrom >= ? AND (ValidUntil <= ? OR ValidUntil IS NULL)
 `
 
 type FindValidOrderDiscountRulesParams struct {
@@ -557,24 +529,20 @@ func (q *Queries) FindValidOrderDiscountRules(ctx context.Context, arg FindValid
 }
 
 const updateItemValorization = `-- name: UpdateItemValorization :exec
-UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, DiscountRaw = ?, DiscountPercentual = ?, UpdatedAt = ? WHERE ItemID = ?
+UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, UpdatedAt = ? WHERE ItemID = ?
 `
 
 type UpdateItemValorizationParams struct {
-	Lastprice          float64   `json:"lastprice"`
-	Lastcost           float64   `json:"lastcost"`
-	Discountraw        float64   `json:"discountraw"`
-	Discountpercentual float64   `json:"discountpercentual"`
-	Updatedat          time.Time `json:"updatedat"`
-	Itemid             string    `json:"itemid"`
+	Lastprice float64   `json:"lastprice"`
+	Lastcost  float64   `json:"lastcost"`
+	Updatedat time.Time `json:"updatedat"`
+	Itemid    string    `json:"itemid"`
 }
 
 func (q *Queries) UpdateItemValorization(ctx context.Context, arg UpdateItemValorizationParams) error {
 	_, err := q.db.ExecContext(ctx, updateItemValorization,
 		arg.Lastprice,
 		arg.Lastcost,
-		arg.Discountraw,
-		arg.Discountpercentual,
 		arg.Updatedat,
 		arg.Itemid,
 	)

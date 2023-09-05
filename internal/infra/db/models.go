@@ -181,12 +181,10 @@ type VmtItemsofdiscountrule struct {
 }
 
 type VmtItemsvaluation struct {
-	Itemid             string    `json:"itemid"`
-	Lastprice          float64   `json:"lastprice"`
-	Lastcost           float64   `json:"lastcost"`
-	Discountraw        float64   `json:"discountraw"`
-	Discountpercentual float64   `json:"discountpercentual"`
-	Updatedat          time.Time `json:"updatedat"`
+	Itemid    string    `json:"itemid"`
+	Lastprice float64   `json:"lastprice"`
+	Lastcost  float64   `json:"lastcost"`
+	Updatedat time.Time `json:"updatedat"`
 }
 
 type VmtItemvaluationlog struct {
@@ -197,13 +195,11 @@ type VmtItemvaluationlog struct {
 }
 
 type VmtOrder struct {
-	ID                 string  `json:"id"`
-	Customer           string  `json:"customer"`
-	Price              float64 `json:"price"`
-	Paymentmethod      int32   `json:"paymentmethod"`
-	Status             int32   `json:"status"`
-	Discountraw        float64 `json:"discountraw"`
-	Discountpercentual float64 `json:"discountpercentual"`
+	ID            string  `json:"id"`
+	Customer      string  `json:"customer"`
+	Price         float64 `json:"price"`
+	Paymentmethod int32   `json:"paymentmethod"`
+	Status        int32   `json:"status"`
 }
 
 type VmtOrderdetail struct {

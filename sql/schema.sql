@@ -24,7 +24,7 @@ CREATE TABLE VMT_Orders (
 	Customer           VARCHAR(64) NOT NULL,
 	Price              DECIMAL(10,2) NOT NULL,
 	PaymentMethod      INT NOT NULL,
-    Status             INT NOT NULL,
+    Status             INT NOT NULL
 );
 
 CREATE TABLE VMT_OrderDetails (

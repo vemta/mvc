@@ -85,7 +85,7 @@ UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, UpdatedAt = ? WHERE I
 
 -- name: FindValidOrderDiscountRules :many
 SELECT * FROM VMT_OrderDiscountRules
-WHERE ValidFrom >= ? AND ValidUntil <= ?;
+WHERE ValidFrom <= ? AND (ValidUntil >= ? OR ValidUntil IS NULL);
 
 -- name: FindItemDiscountRule :many
 SELECT * FROM VMT_ItemsOfDiscountRule
