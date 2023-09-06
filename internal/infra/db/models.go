@@ -173,6 +173,7 @@ type VmtItemdiscountrule struct {
 	Validuntil         sql.NullTime                   `json:"validuntil"`
 	Abovevalue         float64                        `json:"abovevalue"`
 	Bellowvalue        float64                        `json:"bellowvalue"`
+	Allitems           int32                          `json:"allitems"`
 }
 
 type VmtItemsofdiscountrule struct {

@@ -10,11 +10,9 @@ import (
 )
 
 type ItemValorizationUpdateUsecaseInput struct {
-	Item               string  `json:"item"`
-	Cost               float64 `json:"cost"`
-	Price              float64 `json:"price"`
-	DiscountRaw        float64 `json:"discount_raw"`
-	DiscountPercentual float64 `json:"discount_percentual"`
+	Item  string  `json:"item"`
+	Cost  float64 `json:"cost"`
+	Price float64 `json:"price"`
 }
 
 type ItemValuationUpdateUsecase struct {
@@ -30,11 +28,9 @@ func NewItemValorizationUpdateUsecase(uow uow.UowInterface) *ItemValuationUpdate
 func (u *ItemValuationUpdateUsecase) Execute(ctx context.Context, input ItemValorizationUpdateUsecaseInput) error {
 	return u.Uow.Do(ctx, func(_ *uow.Uow) error {
 		return repository.GetItemsRepository(ctx, u.Uow).UpdateItemValuation(ctx, input.Item, &entity.ItemValuation{
-			DiscountRaw:        input.DiscountRaw,
-			DiscountPercentual: input.DiscountPercentual,
-			LastCost:           input.Cost,
-			LastPrice:          input.Price,
-			UpdatedAt:          time.Now(),
+			LastCost:  input.Cost,
+			LastPrice: input.Price,
+			UpdatedAt: time.Now(),
 		})
 	})
 }

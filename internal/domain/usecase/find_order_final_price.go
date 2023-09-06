@@ -34,8 +34,14 @@ func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, id string) (fl
 		current += price
 	}
 
-	current -= current - order.DiscountRaw
-	current *= order.DiscountPercentual
+	availableDiscounts, err := repository.GetDiscountRulesRepository(ctx, u.Uow).FindValidOrderDiscountRules(ctx)
+	for _, discount := range *availableDiscounts {
+		if discount.ApplyFirst == "RAW" {
+			current = (current - discount.DiscountRaw) * (1 - discount.DiscountPercentual)
+		} else {
+			current = (current * (1 - discount.DiscountPercentual)) - discount.DiscountRaw
+		}
+	}
 
 	return math.Max(0, current), nil
 }

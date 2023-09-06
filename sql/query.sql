@@ -98,12 +98,12 @@ SELECT * FROM VMT_OrderDiscountRules WHERE ID = ?;
 -- name: FindAvailableDiscountRulesForItem :many
 SELECT * FROM VMT_ItemsOfDiscountRule 
 INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
-WHERE VMT_ItemsOfDiscountRule.Item = ?;
+WHERE VMT_ItemsOfDiscountRule.Item = ? OR VMT_ItemDiscountRules.AllItems = 1;
 
 -- name: CreateItemDiscountRule :exec
 INSERT INTO VMT_ItemDiscountRules 
-(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, ValidFrom, ValidUntil, AboveValue, BellowValue)
-VALUES (?,?,?,?,?,?,?,?,?);
+(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, ValidFrom, ValidUntil, AboveValue, BellowValue, AllItems)
+VALUES (?,?,?,?,?,?,?,?,?,?);
 
 -- name: CreateOrderDiscountRule :exec
 INSERT INTO VMT_OrderDiscountRules 

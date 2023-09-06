@@ -51,8 +51,8 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 
 const createItemDiscountRule = `-- name: CreateItemDiscountRule :exec
 INSERT INTO VMT_ItemDiscountRules 
-(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, ValidFrom, ValidUntil, AboveValue, BellowValue)
-VALUES (?,?,?,?,?,?,?,?,?)
+(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, ValidFrom, ValidUntil, AboveValue, BellowValue, AllItems)
+VALUES (?,?,?,?,?,?,?,?,?,?)
 `
 
 type CreateItemDiscountRuleParams struct {
@@ -65,6 +65,7 @@ type CreateItemDiscountRuleParams struct {
 	Validuntil         sql.NullTime                   `json:"validuntil"`
 	Abovevalue         float64                        `json:"abovevalue"`
 	Bellowvalue        float64                        `json:"bellowvalue"`
+	Allitems           int32                          `json:"allitems"`
 }
 
 func (q *Queries) CreateItemDiscountRule(ctx context.Context, arg CreateItemDiscountRuleParams) error {
@@ -78,6 +79,7 @@ func (q *Queries) CreateItemDiscountRule(ctx context.Context, arg CreateItemDisc
 		arg.Validuntil,
 		arg.Abovevalue,
 		arg.Bellowvalue,
+		arg.Allitems,
 	)
 	return err
 }
@@ -116,9 +118,9 @@ func (q *Queries) CreateOrderDiscountRule(ctx context.Context, arg CreateOrderDi
 }
 
 const findAvailableDiscountRulesForItem = `-- name: FindAvailableDiscountRulesForItem :many
-SELECT discountrule, item, id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue FROM VMT_ItemsOfDiscountRule 
+SELECT discountrule, item, id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue, allitems FROM VMT_ItemsOfDiscountRule 
 INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
-WHERE VMT_ItemsOfDiscountRule.Item = ?
+WHERE VMT_ItemsOfDiscountRule.Item = ? OR VMT_ItemDiscountRules.AllItems = 1
 `
 
 type FindAvailableDiscountRulesForItemRow struct {
@@ -133,6 +135,7 @@ type FindAvailableDiscountRulesForItemRow struct {
 	Validuntil         sql.NullTime                   `json:"validuntil"`
 	Abovevalue         float64                        `json:"abovevalue"`
 	Bellowvalue        float64                        `json:"bellowvalue"`
+	Allitems           int32                          `json:"allitems"`
 }
 
 func (q *Queries) FindAvailableDiscountRulesForItem(ctx context.Context, item string) ([]FindAvailableDiscountRulesForItemRow, error) {
@@ -156,6 +159,7 @@ func (q *Queries) FindAvailableDiscountRulesForItem(ctx context.Context, item st
 			&i.Validuntil,
 			&i.Abovevalue,
 			&i.Bellowvalue,
+			&i.Allitems,
 		); err != nil {
 			return nil, err
 		}
@@ -349,7 +353,7 @@ func (q *Queries) FindItemCostHistory(ctx context.Context, item string) ([]VmtIt
 }
 
 const findItemDiscountRule = `-- name: FindItemDiscountRule :many
-SELECT discountrule, item, id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue FROM VMT_ItemsOfDiscountRule
+SELECT discountrule, item, id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue, allitems FROM VMT_ItemsOfDiscountRule
 INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
 WHERE DiscountRule = ?
 `
@@ -366,6 +370,7 @@ type FindItemDiscountRuleRow struct {
 	Validuntil         sql.NullTime                   `json:"validuntil"`
 	Abovevalue         float64                        `json:"abovevalue"`
 	Bellowvalue        float64                        `json:"bellowvalue"`
+	Allitems           int32                          `json:"allitems"`
 }
 
 func (q *Queries) FindItemDiscountRule(ctx context.Context, discountrule string) ([]FindItemDiscountRuleRow, error) {
@@ -389,6 +394,7 @@ func (q *Queries) FindItemDiscountRule(ctx context.Context, discountrule string)
 			&i.Validuntil,
 			&i.Abovevalue,
 			&i.Bellowvalue,
+			&i.Allitems,
 		); err != nil {
 			return nil, err
 		}

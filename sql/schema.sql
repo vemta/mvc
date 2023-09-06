@@ -79,7 +79,8 @@ CREATE TABLE VMT_ItemDiscountRules (
 	ValidFrom DATETIME NOT NULL,
 	ValidUntil DATETIME,
 	AboveValue DECIMAL(10,2) NOT NULL,
-	BellowValue DECIMAL(10,2) NOT NULL
+	BellowValue DECIMAL(10,2) NOT NULL,
+	AllItems INT NOT NULL
 );
 
 CREATE TABLE VMT_ItemsOfDiscountRule (
