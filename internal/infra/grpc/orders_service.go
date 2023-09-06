@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/vemta/mvc/internal/domain/usecase"
 
 	"github.com/vemta/mvc/internal/infra/db"
@@ -24,7 +25,8 @@ func NewOrderService(uow *uow.UowInterface, queries *db.Queries) *OrderServiceSe
 
 func (s *OrderServiceServer) GetFinalPrice(ctx context.Context, input *pb.GetFinalPriceRequest) (*pb.GetFinalPriceResponse, error) {
 	uc := usecase.NewFindOrderFinalPriceUsecase(*s.uow)
-	finalPrice, err := uc.Execute(ctx, input.Order)
+	//TODO
+	finalPrice, err := uc.Execute(ctx, []string{})
 	if err != nil {
 		return nil, err
 	}
