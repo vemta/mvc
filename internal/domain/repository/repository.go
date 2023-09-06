@@ -14,7 +14,7 @@ type ItemsRepositoryInterface interface {
 	FindItemCostHistory(context.Context, string) (*[]entity.ItemValuationLog, error)
 	FindItemPriceHistory(context.Context, string) (*[]entity.ItemValuationLog, error)
 	UpdateItemValuation(context.Context, string, *entity.ItemValuation) error
-	Create(ctx context.Context, login *entity.Item) error
+	Create(context.Context, *entity.Item) error
 	RepositoryInterface
 }
 
@@ -38,6 +38,6 @@ type DiscountRulesRepositoryInterface interface {
 	FindOrderDiscountRules(context.Context, string) (*entity.OrderDiscountRule, error)
 	FindValidDiscountRulesForItem(context.Context, string) (*[]entity.ItemDiscountRule, error)
 	FindValidOrderDiscountRules(context.Context) (*[]entity.OrderDiscountRule, error)
-	CreateItemDiscountRule(context.Context, entity.ItemDiscountRule) error
-	CreateOrderDiscountRule(context.Context, entity.OrderDiscountRule) error
+	CreateItemDiscountRule(context.Context, *entity.ItemDiscountRule) error
+	CreateOrderDiscountRule(context.Context, *entity.OrderDiscountRule) error
 }

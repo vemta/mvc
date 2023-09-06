@@ -173,7 +173,7 @@ func (r *DiscountRepository) FindValidOrderDiscountRules(ctx context.Context) (*
 	return &rules, nil
 }
 
-func (r *DiscountRepository) CreateItemDiscountRule(ctx context.Context, rule entity.ItemDiscountRule) error {
+func (r *DiscountRepository) CreateItemDiscountRule(ctx context.Context, rule *entity.ItemDiscountRule) error {
 	return r.Queries.CreateItemDiscountRule(ctx, db.CreateItemDiscountRuleParams{
 		ID:                 rule.ID,
 		Name:               rule.Name,
@@ -187,7 +187,7 @@ func (r *DiscountRepository) CreateItemDiscountRule(ctx context.Context, rule en
 	})
 }
 
-func (r *DiscountRepository) CreateOrderDiscountRule(ctx context.Context, rule entity.OrderDiscountRule) error {
+func (r *DiscountRepository) CreateOrderDiscountRule(ctx context.Context, rule *entity.OrderDiscountRule) error {
 	return r.Queries.CreateOrderDiscountRule(ctx, db.CreateOrderDiscountRuleParams{
 		ID:                 rule.ID,
 		Name:               rule.Name,
