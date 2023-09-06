@@ -44,8 +44,6 @@ func (r *CustomerRepository) FindCustomerOrders(ctx context.Context, customer st
 				ordersSlice = append(ordersSlice, *currentOrder)
 			}
 			currentOrder.ID = order.Orderid
-			currentOrder.DiscountRaw = order.Discountraw
-			currentOrder.DiscountPercentual = order.Discountpercentual
 			currentOrder.PaymentMethod = int(order.Paymentmethod)
 			currentOrder.Price = order.Orderprice
 			currentOrder.Status = orderstatus.OrderStatus((order.Orderstatus))
@@ -67,10 +65,8 @@ func (r *CustomerRepository) FindCustomerOrders(ctx context.Context, customer st
 					Name: order.Itemcategoryname,
 				},
 				Valuation: &entity.ItemValuation{
-					DiscountRaw:        order.Itemdiscountraw,
-					LastCost:           order.Itemcost,
-					LastPrice:          order.Itemprice,
-					DiscountPercentual: order.Itemdiscountpercentual,
+					LastCost:  order.Itemcost,
+					LastPrice: order.Itemprice,
 				},
 			},
 		})

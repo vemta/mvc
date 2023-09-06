@@ -60,9 +60,7 @@ func (r *OrderRepository) FindOrder(ctx context.Context, value string) (*entity.
 			Birthdate: entry.Customerbirthdate,
 		}
 
-		order.DiscountPercentual = entry.Orderdiscountpercentual
 		order.ID = entry.Orderid
-		order.DiscountRaw = entry.Orderdiscountraw
 		order.Price = entry.Orderprice
 		order.Status = orderstatus.OrderStatus(uint8(entry.Orderstatus))
 		order.PaymentMethod = int(entry.Orderpaymentmethod)

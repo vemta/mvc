@@ -49,6 +49,72 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 	return err
 }
 
+const createItemDiscountRule = `-- name: CreateItemDiscountRule :exec
+INSERT INTO VMT_ItemDiscountRules 
+(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, ValidFrom, ValidUntil, AboveValue, BellowValue)
+VALUES (?,?,?,?,?,?,?,?,?)
+`
+
+type CreateItemDiscountRuleParams struct {
+	ID                 string                         `json:"id"`
+	Name               string                         `json:"name"`
+	Discountraw        float64                        `json:"discountraw"`
+	Discountpercentual float64                        `json:"discountpercentual"`
+	Applyfirst         VmtItemdiscountrulesApplyfirst `json:"applyfirst"`
+	Validfrom          time.Time                      `json:"validfrom"`
+	Validuntil         sql.NullTime                   `json:"validuntil"`
+	Abovevalue         float64                        `json:"abovevalue"`
+	Bellowvalue        float64                        `json:"bellowvalue"`
+}
+
+func (q *Queries) CreateItemDiscountRule(ctx context.Context, arg CreateItemDiscountRuleParams) error {
+	_, err := q.db.ExecContext(ctx, createItemDiscountRule,
+		arg.ID,
+		arg.Name,
+		arg.Discountraw,
+		arg.Discountpercentual,
+		arg.Applyfirst,
+		arg.Validfrom,
+		arg.Validuntil,
+		arg.Abovevalue,
+		arg.Bellowvalue,
+	)
+	return err
+}
+
+const createOrderDiscountRule = `-- name: CreateOrderDiscountRule :exec
+INSERT INTO VMT_OrderDiscountRules 
+(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, ValidFrom, ValidUntil, AboveValue, BellowValue)
+VALUES (?,?,?,?,?,?,?,?,?)
+`
+
+type CreateOrderDiscountRuleParams struct {
+	ID                 string                          `json:"id"`
+	Name               string                          `json:"name"`
+	Discountraw        float64                         `json:"discountraw"`
+	Discountpercentual float64                         `json:"discountpercentual"`
+	Applyfirst         VmtOrderdiscountrulesApplyfirst `json:"applyfirst"`
+	Validfrom          time.Time                       `json:"validfrom"`
+	Validuntil         sql.NullTime                    `json:"validuntil"`
+	Abovevalue         float64                         `json:"abovevalue"`
+	Bellowvalue        float64                         `json:"bellowvalue"`
+}
+
+func (q *Queries) CreateOrderDiscountRule(ctx context.Context, arg CreateOrderDiscountRuleParams) error {
+	_, err := q.db.ExecContext(ctx, createOrderDiscountRule,
+		arg.ID,
+		arg.Name,
+		arg.Discountraw,
+		arg.Discountpercentual,
+		arg.Applyfirst,
+		arg.Validfrom,
+		arg.Validuntil,
+		arg.Abovevalue,
+		arg.Bellowvalue,
+	)
+	return err
+}
+
 const findAvailableDiscountRulesForItem = `-- name: FindAvailableDiscountRulesForItem :many
 SELECT discountrule, item, id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue FROM VMT_ItemsOfDiscountRule 
 INNER JOIN VMT_ItemDiscountRules ON VMT_ItemDiscountRules.ID = VMT_ItemsOfDiscountRule.DiscountRule
@@ -487,7 +553,7 @@ func (q *Queries) FindOrderDiscountRule(ctx context.Context, id string) (VmtOrde
 
 const findValidOrderDiscountRules = `-- name: FindValidOrderDiscountRules :many
 SELECT id, name, discountraw, discountpercentual, applyfirst, validfrom, validuntil, abovevalue, bellowvalue FROM VMT_OrderDiscountRules
-WHERE ValidFrom >= ? AND (ValidUntil <= ? OR ValidUntil IS NULL)
+WHERE ValidFrom <= ? AND (ValidUntil >= ? OR ValidUntil IS NULL)
 `
 
 type FindValidOrderDiscountRulesParams struct {

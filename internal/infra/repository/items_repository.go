@@ -57,12 +57,10 @@ func (r *ItemRepository) FindItem(ctx context.Context, value string) (*entity.It
 		IsGood:      item.Isgood,
 		Description: item.Description,
 		Valuation: &entity.ItemValuation{
-			PriceHistory:       *priceHistory,
-			CostHistory:        *costHistory,
-			DiscountRaw:        item.Discountraw,
-			DiscountPercentual: item.Discountpercentual,
-			LastCost:           item.Lastcost,
-			LastPrice:          item.Lastprice,
+			PriceHistory: *priceHistory,
+			CostHistory:  *costHistory,
+			LastCost:     item.Lastcost,
+			LastPrice:    item.Lastprice,
 		},
 	}, nil
 }
@@ -107,11 +105,9 @@ func (r *ItemRepository) FindItemPriceHistory(ctx context.Context, value string)
 
 func (r *ItemRepository) UpdateItemValorization(ctx context.Context, item string, valuation *entity.ItemValuation) error {
 	return r.Queries.UpdateItemValorization(ctx, db.UpdateItemValorizationParams{
-		Lastprice:          valuation.LastPrice,
-		Lastcost:           valuation.LastCost,
-		Discountraw:        valuation.DiscountRaw,
-		Discountpercentual: valuation.DiscountPercentual,
-		Updatedat:          valuation.UpdatedAt,
-		Itemid:             item,
+		Lastprice: valuation.LastPrice,
+		Lastcost:  valuation.LastCost,
+		Updatedat: valuation.UpdatedAt,
+		Itemid:    item,
 	})
 }

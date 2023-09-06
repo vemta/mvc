@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"time"
 
 	"github.com/vemta/common/entity"
@@ -143,7 +142,7 @@ func (r *DiscountRepository) FindValidOrderDiscountRules(ctx context.Context) (*
 		return nil, err
 	}
 
-	rules := make([]entity.ItemDiscountRule, 0)
+	rules := make([]entity.OrderDiscountRule, 0)
 	for _, rule := range foundRules {
 
 		applyFirst := ""
@@ -158,7 +157,7 @@ func (r *DiscountRepository) FindValidOrderDiscountRules(ctx context.Context) (*
 			return time.Time{}
 		}
 
-		rules = append(rules, entity.ItemDiscountRule{
+		rules = append(rules, entity.OrderDiscountRule{
 			DiscountPercentual: rule.Discountpercentual,
 			DiscountRaw:        rule.Discountraw,
 			ID:                 rule.ID,
@@ -175,9 +174,29 @@ func (r *DiscountRepository) FindValidOrderDiscountRules(ctx context.Context) (*
 }
 
 func (r *DiscountRepository) CreateItemDiscountRule(ctx context.Context, rule entity.ItemDiscountRule) error {
-	return errors.New("not implemented yet")
+	return r.Queries.CreateItemDiscountRule(ctx, db.CreateItemDiscountRuleParams{
+		ID:                 rule.ID,
+		Name:               rule.Name,
+		Discountraw:        rule.DiscountRaw,
+		Discountpercentual: rule.DiscountPercentual,
+		Applyfirst:         db.VmtItemdiscountrulesApplyfirst(rule.ApplyFirst),
+		Validfrom:          rule.ValidFrom,
+		Validuntil:         sql.NullTime{Time: rule.ValidUntil, Valid: !rule.ValidUntil.IsZero()},
+		Abovevalue:         rule.AboveValue,
+		Bellowvalue:        rule.BellowValue,
+	})
 }
 
 func (r *DiscountRepository) CreateOrderDiscountRule(ctx context.Context, rule entity.OrderDiscountRule) error {
-	return errors.New("not implemented yet")
+	return r.Queries.CreateOrderDiscountRule(ctx, db.CreateOrderDiscountRuleParams{
+		ID:                 rule.ID,
+		Name:               rule.Name,
+		Discountraw:        rule.DiscountRaw,
+		Discountpercentual: rule.DiscountPercentual,
+		Applyfirst:         db.VmtOrderdiscountrulesApplyfirst(rule.ApplyFirst),
+		Validfrom:          rule.ValidFrom,
+		Validuntil:         sql.NullTime{Time: rule.ValidUntil, Valid: !rule.ValidUntil.IsZero()},
+		Abovevalue:         rule.AboveValue,
+		Bellowvalue:        rule.BellowValue,
+	})
 }
