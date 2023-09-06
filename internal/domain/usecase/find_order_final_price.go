@@ -18,16 +18,11 @@ func NewFindOrderFinalPriceUsecase(uow uow.UowInterface) *FindOrderFinalPriceUse
 	}
 }
 
-func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, id string) (float64, error) {
-	order, err := repository.GetOrdersRepository(ctx, u.Uow).FindOrder(ctx, id)
-	if err != nil {
-		return 0, err
-	}
-
+func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, items []string) (float64, error) {
 	current := 0.0
-	for _, detail := range *order.Items {
+	for _, item := range items {
 		uc := NewFindItemFinalPriceUsecase(u.Uow)
-		price, err := uc.Execute(ctx, detail.Item.ID)
+		price, err := uc.Execute(ctx, item)
 		if err != nil {
 			return 0, err
 		}
@@ -35,6 +30,9 @@ func (u *FindOrderFinalPriceUsecase) Execute(ctx context.Context, id string) (fl
 	}
 
 	availableDiscounts, err := repository.GetDiscountRulesRepository(ctx, u.Uow).FindValidOrderDiscountRules(ctx)
+	if err != nil {
+		return 0, err
+	}
 	for _, discount := range *availableDiscounts {
 		if discount.ApplyFirst == "RAW" {
 			current = (current - discount.DiscountRaw) * (1 - discount.DiscountPercentual)

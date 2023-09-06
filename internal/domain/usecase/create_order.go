@@ -41,8 +41,6 @@ func (u *CreateOrderUsecase) Execute(ctx context.Context, input CreateOrderUseca
 
 	id := strings.Replace(uuid.New().String(), "-", "", -1)
 
-	// TODO: Implement discount rules
-
 	order := &entity.Order{
 		ID:            id,
 		Customer:      user,
@@ -51,16 +49,17 @@ func (u *CreateOrderUsecase) Execute(ctx context.Context, input CreateOrderUseca
 		Status:        orderstatus.WaitingPaymentApproval,
 	}
 
-	current := 0.0
-	for _, detail := range *order.Items {
-		uc := NewFindItemFinalPriceUsecase(u.Uow)
-		price, err := uc.Execute(ctx, detail.Item.ID)
-		if err != nil {
-			return err
-		}
-		current += price * float64(detail.Quantity)
+	items := make([]string, 0)
+	for _, item := range *input.Items {
+		items = append(items, item.Item.ID)
 	}
-	order.Price = current
+
+	uc := NewFindOrderFinalPriceUsecase(u.Uow)
+	price, err := uc.Execute(ctx, items)
+	if err != nil {
+		return err
+	}
+	order.Price = price
 
 	return repository.GetOrdersRepository(ctx, u.Uow).Create(ctx, order)
 }
