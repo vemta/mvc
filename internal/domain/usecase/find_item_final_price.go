@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
@@ -23,6 +24,19 @@ func (u *FindItemFinalPriceUsecase) Execute(ctx context.Context, id string) (flo
 		return 0, err
 	}
 
-	valuation := item.Valuation
-	return (valuation.LastPrice - valuation.DiscountRaw) * (1 - valuation.DiscountPercentual), nil
+	currentPrice := item.Valuation.LastPrice
+	rules, e := repository.GetDiscountRulesRepository(ctx, u.Uow).FindValidDiscountRulesForItem(ctx, id, time.Now())
+	if e != nil {
+		return currentPrice, nil
+	}
+
+	for _, rule := range *rules {
+		if rule.ApplyFirst == "raw" {
+			currentPrice = (currentPrice - rule.DiscountRaw) * (1 - rule.DiscountPercentual)
+		} else {
+			currentPrice = (currentPrice * (1 - rule.DiscountPercentual)) - rule.DiscountRaw
+		}
+	}
+
+	return currentPrice, nil
 }

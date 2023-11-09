@@ -47,10 +47,8 @@ func (u *CreateOrderUsecase) Execute(ctx context.Context, input CreateOrderUseca
 		ID:            id,
 		Customer:      user,
 		Items:         input.Items,
-		PaymentMethod: input.PaymentMethod,
-		// DiscountRaw:        input.DiscountRaw,
-		// DiscountPercentual: input.DiscountPercentual,
-		Status: enum.WaitingPaymentApproval,
+		PaymentMethod: *enum.GetPaymentMethod(input.PaymentMethod),
+		Status:        enum.WaitingPaymentApproval,
 	}
 
 	current := 0.0

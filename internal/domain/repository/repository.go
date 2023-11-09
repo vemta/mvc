@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/vemta/common/entity"
 )
@@ -31,4 +32,13 @@ type CustomersRepositoryInterface interface {
 	FindCustomer(context.Context, string) (*entity.Customer, error)
 	Create(context.Context, *entity.Customer) error
 	RepositoryInterface
+}
+
+type DiscountRuleRepositoryInterface interface {
+	FindValidDiscountRulesForItem(context.Context, string, time.Time) (*[]entity.ItemDiscountRule, error)
+	FindValidDiscountRulesForOrder(context.Context, float64, time.Time) (*[]entity.OrderDiscountRule, error)
+	FindActiveDiscountRules(context.Context, time.Time) (*[]entity.DiscountRule, error)
+	FindItemsForDiscountRule(context.Context, string) ([]string, error)
+	CreateItemDiscountRule(context.Context, *entity.ItemDiscountRule) error
+	CreateOrderDiscountRule(context.Context, *entity.OrderDiscountRule) error
 }

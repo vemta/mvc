@@ -25,12 +25,12 @@ VMT_Items.IsGood ItemIsGood,
 VMT_Items.CreatedAt ItemCreatedAt,
 VMT_ItemCategories.ID ItemCategoryId,
 VMT_ItemCategories.Name ItemCategoryName,
-VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
-VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
 VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
-VMT_OrderDetails.Quantity DetailQuantity
+VMT_OrderDetails.Quantity DetailQuantity,
+VMT_OrderDetails.DiscountPercentual ItemDiscountPercentual,
+VMT_OrderDetails.DiscountRaw ItemDiscountRaw
 FROM VMT_Orders 
 INNER JOIN VMT_Customers on VMT_Customers.Email = VMT_Orders.Customer 
 INNER JOIN VMT_OrderDetails ON VMT_OrderDetails.OrderID = VMT_Orders.ID 
@@ -65,12 +65,12 @@ VMT_Items.CreatedAt ItemCreatedAt,
 VMT_Items.Category ItemCategory,
 VMT_ItemCategories.ID ItemCategoryId,
 VMT_ItemCategories.Name ItemCategoryName,
-VMT_ItemsValuation.DiscountRaw ItemDiscountRaw,
-VMT_ItemsValuation.DiscountPercentual ItemDiscountPercentual,
 VMT_ItemsValuation.LastPrice ItemPrice,
 VMT_ItemsValuation.LastCost ItemCost,
 VMT_ItemsValuation.UpdatedAt ValuationUpdatedAt,
-VMT_OrderDetails.Quantity DetailQuantity
+VMT_OrderDetails.Quantity DetailQuantity,
+VMT_OrderDetails.DiscountPercentual ItemDiscountPercentual,
+VMT_OrderDetails.DiscountRaw ItemDiscountRaw
 FROM VMT_OrderDetails
 INNER JOIN VMT_Customers ON VMT_Customers.Email = VMT_Orders.Customer 
 INNER JOIN VMT_Items ON VMT_Items.ID = VMT_OrderDetails.Item
@@ -89,4 +89,49 @@ INSERT INTO VMT_Customers (Email, FullName, Birthdate) VALUES (?,?,?);
 UPDATE VMT_Orders SET Status = ? WHERE ID = ?;
 
 -- name: UpdateItemValorization :exec
-UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, DiscountRaw = ?, DiscountPercentual = ?, UpdatedAt = ? WHERE ItemID = ?;
+UPDATE VMT_ItemsValuation SET LastPrice = ?, LastCost = ?, UpdatedAt = ? WHERE ItemID = ?;
+
+-- name: FindValidDiscountRulesForItem :many
+SELECT * FROM VMT_DiscountRuleItems
+INNER JOIN VMT_DiscountRules ON VMT_DiscountRules.ID = VMT_DiscountRuleItems.DiscountRule
+WHERE VMT_DiscountRuleItems.Item = ?
+AND VMT_DiscountRules.ValidFrom >= ? AND VMT_DiscountRules.ValidUntil <= ?
+AND VMT_DiscountRules.AboveValue >= ? AND VMT_DiscountRules.BellowValue <= ?
+ORDER BY VMT_DiscountRules.ID;
+
+-- name: FindValidDiscountRulesForOrder :many
+SELECT * FROM VMT_DiscountRules
+WHERE VMT_DiscountRules.AboveValue >= ? AND BellowValue <= ? 
+AND VMT_DiscountRules.ValidFrom <= ? AND VMT_DiscountRules.ValidUntil >= ?;
+
+-- name: CreateDiscountRule :exec
+INSERT INTO VMT_DiscountRules 
+(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, AboveValue, BellowValue, ValidFrom, ValidUntil, Type)
+VALUES (?,?,?,?,?,?,?,?,?,?);
+
+-- name: CreateItemForDiscountRule :exec
+INSERT INTO VMT_DiscountRuleItems
+(DiscountRule, Item)
+VALUES (?,?);
+
+-- name: FindActiveDiscountRules :many
+SELECT * FROM VMT_DiscountRules WHERE ValidFrom <= ? AND ValidUntil >= ?;
+
+-- name: FindValidItemsForDiscountRuleDetailed :many 
+SELECT 
+VMT_Items.ID ItemID,
+VMT_Items.Title ItemTitle,
+VMT_Items.Description ItemDescription,
+VMT_Items.IsGood ItemIsGood,
+VMT_Items.CreatedAt ItemCreatedAt,
+VMT_Items.Category ItemCategory,
+VMT_ItemsValuation.LastPrice LastPrice,
+VMT_ItemsValuation.LastCost LastCost,
+VMT_ItemsValuation.UpdatedAt PriceUpdatedAt
+FROM VMT_DiscountRuleItems
+INNER JOIN VMT_Items ON VMT_Items.ID = VMT_DiscountRuleItems.Item
+INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_DiscountRuleItems.Item
+WHERE DiscountRule = ?;
+
+-- name: FindValidItemsForDiscountRule :many 
+SELECT Item FROM VMT_DiscountRuleItems WHERE DiscountRule = ?;

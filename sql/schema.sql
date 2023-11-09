@@ -11,7 +11,7 @@ CREATE TABLE VMT_CustomerCart (
 	Customer VARCHAR(64) NOT NULL,
 	Item VARCHAR(64) NOT NULL,
 	Quantity INT NOT NULL
-)
+);
 
 CREATE TABLE VMT_Customers (
 	Email VARCHAR(64) PRIMARY KEY NOT NULL,
@@ -32,8 +32,10 @@ CREATE TABLE VMT_Orders (
 CREATE TABLE VMT_OrderDetails (
     OrderID VARCHAR(64) NOT NULL,
     Item VARCHAR(64) NOT NULL,
+	DiscountRaw DECIMAL(10,2) NOT NULL,
+	DiscountPercentual DECIMAL(10,2) NOT NULL,
+	ApplyFirst CHAR NOT NULL,
     Quantity INT NOT NULL,
-
     PRIMARY KEY (OrderID, Item)
 );
 
@@ -50,8 +52,6 @@ CREATE TABLE VMT_ItemsValuation (
 	ItemID VARCHAR(64) PRIMARY KEY NOT NULL,
 	LastPrice DECIMAL(10,2) NOT NULL,
 	LastCost DECIMAL(10,2) NOT NULL,
-	DiscountRaw DECIMAL(10,2) NOT NULL,
-	DiscountPercentual DECIMAL(10,2) NOT NULL,
 	UpdatedAt DATETIME NOT NULL
 );
 
@@ -59,7 +59,24 @@ CREATE TABLE VMT_ItemValuationLog (
 	Item VARCHAR(64) NOT NULL,
 	Price DECIMAL(10,2) NOT NULL,
 	ValuationType ENUM("Price", "Cost") NOT NULL,
-	ValorizatedAt DATETIME NOT NULL,
-	DiscountRaw DECIMAL(10,2) NOT NULL,
-	DiscountPercentual DECIMAL(10,2) NOT NULL
+	ValorizatedAt DATETIME NOT NULL
 );
+
+CREATE TABLE VMT_DiscountRules (
+	ID VARCHAR(64) PRIMARY KEY NOT NULL,
+	Name VARCHAR(128) NOT NULL,
+	DiscountRaw DECIMAL(10,2) NOT NULL,
+	DiscountPercentual DECIMAL(10,2) NOT NULL,
+	ApplyFirst CHAR NOT NULL,
+	AboveValue DECIMAL(10,2) NOT NULL,
+	BellowValue DECIMAL(10,2) NOT NULL,
+	ValidFrom DATETIME NOT NULL,
+	ValidUntil DATETIME NOT NULL,
+	Type CHAR NOT NULL 
+);
+
+CREATE TABLE VMT_DiscountRuleItems (
+	DiscountRule VARCHAR(64) PRIMARY KEY NOT NULL,
+	Item VARCHAR(64) NOT NULL
+)
+

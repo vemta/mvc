@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/vemta/common/entity"
+	"github.com/vemta/common/enum"
 	"github.com/vemta/mvc/internal/infra/db"
 )
 
@@ -45,9 +46,9 @@ func (r *CustomerRepository) FindCustomerOrders(ctx context.Context, customer st
 			currentOrder.ID = order.Orderid
 			currentOrder.DiscountRaw = order.Discountraw
 			currentOrder.DiscountPercentual = order.Discountpercentual
-			currentOrder.PaymentMethod = int(order.Paymentmethod)
+			currentOrder.PaymentMethod = *enum.GetPaymentMethod(int(order.Paymentmethod))
 			currentOrder.Price = order.Orderprice
-			currentOrder.Status = uint8(order.Orderstatus)
+			currentOrder.Status = enum.OrderStatus(order.Orderstatus)
 			currentOrder.Customer = &entity.Customer{
 				Email:     order.Customeremail,
 				FullName:  order.Customerfullname,
@@ -66,10 +67,8 @@ func (r *CustomerRepository) FindCustomerOrders(ctx context.Context, customer st
 					Name: order.Itemcategoryname,
 				},
 				Valuation: &entity.ItemValuation{
-					DiscountRaw:        order.Itemdiscountraw,
-					LastCost:           order.Itemcost,
-					LastPrice:          order.Itemprice,
-					DiscountPercentual: order.Itemdiscountpercentual,
+					LastCost:  order.Itemcost,
+					LastPrice: order.Itemprice,
 				},
 			},
 		})

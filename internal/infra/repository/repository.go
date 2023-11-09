@@ -38,6 +38,10 @@ func GetOrdersRepository(ctx context.Context, u uow.UowInterface) repository.Ord
 	return getRepository[repository.OrdersRepositoryInterface](ctx, u, "OrdersRepository")
 }
 
+func GetDiscountRulesRepository(ctx context.Context, u uow.UowInterface) repository.DiscountRuleRepositoryInterface {
+	return getRepository[repository.DiscountRuleRepositoryInterface](ctx, u, "DiscountRules")
+}
+
 func getRepository[T repository.RepositoryInterface](ctx context.Context, u uow.UowInterface, name string) T {
 	repo, err := u.GetRepository(ctx, name)
 	if err != nil {

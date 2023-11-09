@@ -58,6 +58,30 @@ type VmtCustomer struct {
 	Birthdate time.Time `json:"birthdate"`
 }
 
+type VmtCustomercart struct {
+	Customer string `json:"customer"`
+	Item     string `json:"item"`
+	Quantity int32  `json:"quantity"`
+}
+
+type VmtDiscountrule struct {
+	ID                 string    `json:"id"`
+	Name               string    `json:"name"`
+	Discountraw        float64   `json:"discountraw"`
+	Discountpercentual float64   `json:"discountpercentual"`
+	Applyfirst         string    `json:"applyfirst"`
+	Abovevalue         float64   `json:"abovevalue"`
+	Bellowvalue        float64   `json:"bellowvalue"`
+	Validfrom          time.Time `json:"validfrom"`
+	Validuntil         time.Time `json:"validuntil"`
+	Type               string    `json:"type"`
+}
+
+type VmtDiscountruleitem struct {
+	Discountrule string `json:"discountrule"`
+	Item         string `json:"item"`
+}
+
 type VmtItem struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
@@ -73,21 +97,17 @@ type VmtItemcategory struct {
 }
 
 type VmtItemsvaluation struct {
-	Itemid             string    `json:"itemid"`
-	Lastprice          float64   `json:"lastprice"`
-	Lastcost           float64   `json:"lastcost"`
-	Discountraw        float64   `json:"discountraw"`
-	Discountpercentual float64   `json:"discountpercentual"`
-	Updatedat          time.Time `json:"updatedat"`
+	Itemid    string    `json:"itemid"`
+	Lastprice float64   `json:"lastprice"`
+	Lastcost  float64   `json:"lastcost"`
+	Updatedat time.Time `json:"updatedat"`
 }
 
 type VmtItemvaluationlog struct {
-	Item               string                           `json:"item"`
-	Price              float64                          `json:"price"`
-	Valuationtype      VmtItemvaluationlogValuationtype `json:"valuationtype"`
-	Valorizatedat      time.Time                        `json:"valorizatedat"`
-	Discountraw        float64                          `json:"discountraw"`
-	Discountpercentual float64                          `json:"discountpercentual"`
+	Item          string                           `json:"item"`
+	Price         float64                          `json:"price"`
+	Valuationtype VmtItemvaluationlogValuationtype `json:"valuationtype"`
+	Valorizatedat time.Time                        `json:"valorizatedat"`
 }
 
 type VmtOrder struct {
@@ -101,9 +121,12 @@ type VmtOrder struct {
 }
 
 type VmtOrderdetail struct {
-	Orderid  string `json:"orderid"`
-	Item     string `json:"item"`
-	Quantity int32  `json:"quantity"`
+	Orderid            string  `json:"orderid"`
+	Item               string  `json:"item"`
+	Discountraw        float64 `json:"discountraw"`
+	Discountpercentual float64 `json:"discountpercentual"`
+	Applyfirst         string  `json:"applyfirst"`
+	Quantity           int32   `json:"quantity"`
 }
 
 type VmtSystemoption struct {
