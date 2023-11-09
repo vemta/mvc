@@ -98,5 +98,4 @@ services:
         "sleep 10s &&
         kafka-topics --create --topic=create_order --if-not-exists --bootstrap-server=broker:29092 &&
       kafka-topics --create --topic=create_item --if-not-exists --bootstrap-server=broker:29092 &&
-      kafka-topics --create --topic=create_item_discount_rule --if-not-exists --bootstrap-server=broker:29092 &&
-      kafka-topics --create --topic=create_order_discount_rule --if-not-exists --bootstrap-server=broker:29092"
+      kafka-topics --create --topic=create_discount_rule --if-not-exists --bootstrap-server=broker:29092"

@@ -37,8 +37,10 @@ type CustomersRepositoryInterface interface {
 type DiscountRuleRepositoryInterface interface {
 	FindValidDiscountRulesForItem(context.Context, string, time.Time) (*[]entity.ItemDiscountRule, error)
 	FindValidDiscountRulesForOrder(context.Context, float64, time.Time) (*[]entity.OrderDiscountRule, error)
-	FindActiveDiscountRules(context.Context, time.Time) (*[]entity.DiscountRule, error)
+	FindActiveDiscountRules(context.Context, time.Time) (*[]any, error)
 	FindItemsForDiscountRule(context.Context, string) ([]string, error)
+	FindAppliedDiscountsForOrder(context.Context, string) (*[]entity.DiscountRule, error)
+	FindAutoApplyDiscountRulesForItem(context.Context, string) (*[]entity.DiscountRule, error)
 	CreateItemDiscountRule(context.Context, *entity.ItemDiscountRule) error
 	CreateOrderDiscountRule(context.Context, *entity.OrderDiscountRule) error
 }

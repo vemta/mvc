@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/vemta/common/entity"
 	"github.com/vemta/mvc/internal/infra/repository"
 	uow "github.com/vemta/mvc/pkg"
 )
@@ -19,6 +18,6 @@ func NewFindActiveDiscountRulesUsecase(uow uow.UowInterface) *FindCustomerUsecas
 	}
 }
 
-func (u *FindActiveDiscountRulesUsecase) Execute(ctx context.Context, customer string) (*[]entity.DiscountRule, error) {
+func (u *FindActiveDiscountRulesUsecase) Execute(ctx context.Context, customer string) (*[]any, error) {
 	return repository.GetDiscountRulesRepository(ctx, u.Uow).FindActiveDiscountRules(ctx, time.Now())
 }

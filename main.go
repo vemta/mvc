@@ -30,7 +30,7 @@ func main() {
 
 	registerRepositories(uow)
 
-	var topics = []string{"create_order", "create_item", "create_order_discount_rule", "create_item_discount_rule"}
+	var topics = []string{"create_order", "create_item", "create_discount_rule"}
 	msgChan := make(chan *kafka.Message)
 	go consumer.Consume(topics, "host.docker.internal:9094", msgChan)
 	consumer.ProcessEvents(ctx, msgChan, uow)

@@ -39,16 +39,18 @@ func (r *DiscountRuleRepository) FindValidDiscountRulesForItem(ctx context.Conte
 
 	for _, rule := range dr {
 		discountRules = append(discountRules, entity.ItemDiscountRule{
-			ID:                 rule.ID,
-			Name:               rule.Name,
-			Items:              []string{rule.Item},
-			DiscountRaw:        rule.Discountraw,
-			DiscountPercentual: rule.Discountpercentual,
-			ApplyFirst:         rule.Applyfirst,
-			AboveValue:         rule.Abovevalue,
-			BellowValue:        rule.Abovevalue,
-			ValidFrom:          rule.Validfrom,
-			ValidUntil:         rule.Validuntil,
+			DiscountRule: &entity.DiscountRule{
+				ID:                 rule.ID,
+				Name:               rule.Name,
+				DiscountRaw:        rule.Discountraw,
+				DiscountPercentual: rule.Discountpercentual,
+				ApplyFirst:         rule.Applyfirst,
+				AboveValue:         rule.Abovevalue,
+				BellowValue:        rule.Abovevalue,
+				ValidFrom:          rule.Validfrom,
+				ValidUntil:         rule.Validuntil,
+			},
+			Items: []string{rule.Item},
 		})
 	}
 
@@ -70,16 +72,24 @@ func (r *DiscountRuleRepository) FindValidDiscountRulesForOrder(ctx context.Cont
 	discountRules := make([]entity.OrderDiscountRule, len(dr))
 
 	for _, rule := range dr {
+		code := ""
+		if rule.Code.Valid {
+			code = rule.Code.String
+		}
 		discountRules = append(discountRules, entity.OrderDiscountRule{
-			ID:                 rule.ID,
-			Name:               rule.Name,
-			DiscountRaw:        rule.Discountraw,
-			DiscountPercentual: rule.Discountpercentual,
-			ApplyFirst:         rule.Applyfirst,
-			AboveValue:         rule.Abovevalue,
-			BellowValue:        rule.Abovevalue,
-			ValidFrom:          rule.Validfrom,
-			ValidUntil:         rule.Validuntil,
+			DiscountRule: &entity.DiscountRule{
+				ID:                 rule.ID,
+				Name:               rule.Name,
+				DiscountRaw:        rule.Discountraw,
+				DiscountPercentual: rule.Discountpercentual,
+				ApplyFirst:         rule.Applyfirst,
+				AboveValue:         rule.Abovevalue,
+				BellowValue:        rule.Abovevalue,
+				ValidFrom:          rule.Validfrom,
+				ValidUntil:         rule.Validuntil,
+				Code:               code,
+				AutoApply:          rule.Autoapply != 0,
+			},
 		})
 	}
 
@@ -130,7 +140,7 @@ func (r *DiscountRuleRepository) CreateOrderDiscountRule(ctx context.Context, ru
 	return nil
 }
 
-func (r *DiscountRuleRepository) FindActiveDiscountRules(ctx context.Context, time time.Time) (*[]entity.DiscountRule, error) {
+func (r *DiscountRuleRepository) FindActiveDiscountRules(ctx context.Context, time time.Time) (*[]any, error) {
 
 	rules, err := r.Queries.FindActiveDiscountRules(ctx, db.FindActiveDiscountRulesParams{
 		Validfrom:  time,
@@ -141,55 +151,116 @@ func (r *DiscountRuleRepository) FindActiveDiscountRules(ctx context.Context, ti
 		return nil, err
 	}
 
-	discountRules := make([]entity.DiscountRule, 0)
+	discountRules := make([]any, 0)
 
 	for _, rule := range rules {
-		if rule.Type == "I" {
+
+		discountRule := &entity.DiscountRule{
+			ID:                 rule.ID,
+			Name:               rule.Name,
+			DiscountRaw:        rule.Discountraw,
+			DiscountPercentual: rule.Discountpercentual,
+			ApplyFirst:         rule.Applyfirst,
+			AboveValue:         rule.Abovevalue,
+			BellowValue:        rule.Bellowvalue,
+			ValidFrom:          rule.Validfrom,
+			ValidUntil:         rule.Validuntil,
+		}
+
+		switch []rune(rule.Type)[0] {
+		case 'I':
 			items, err := r.FindItemsForDiscountRule(ctx, rule.ID)
 			if err != nil {
 				return nil, err
 			}
 			discountRules = append(discountRules, entity.ItemDiscountRule{
-				ID:                 rule.ID,
-				Name:               rule.Name,
-				DiscountRaw:        rule.Discountraw,
-				DiscountPercentual: rule.Discountpercentual,
-				ApplyFirst:         rule.Applyfirst,
-				AboveValue:         rule.Abovevalue,
-				BellowValue:        rule.Bellowvalue,
-				ValidFrom:          rule.Validfrom,
-				ValidUntil:         rule.Validuntil,
-				Items:              items,
+				DiscountRule: discountRule,
+				Items:        items,
 			})
-		} else {
+		case 'O':
 			discountRules = append(discountRules, entity.OrderDiscountRule{
-				ID:                 rule.ID,
-				Name:               rule.Name,
-				DiscountRaw:        rule.Discountraw,
-				DiscountPercentual: rule.Discountpercentual,
-				ApplyFirst:         rule.Applyfirst,
-				AboveValue:         rule.Abovevalue,
-				BellowValue:        rule.Bellowvalue,
-				ValidFrom:          rule.Validfrom,
-				ValidUntil:         rule.Validuntil,
+				DiscountRule: discountRule,
 			})
 		}
 	}
-
 	return &discountRules, nil
-
 }
 
 func (r *DiscountRuleRepository) FindItemsForDiscountRule(ctx context.Context, rule string) ([]string, error) {
-	res, err := r.Queries.FindValidItemsForDiscountRule(ctx, rule)
+	res, err := r.Queries.FindValidItemsForDiscountRuleDetailed(ctx, rule)
 	if err != nil {
 		return nil, err
 	}
 
 	items := make([]string, 0)
 	for _, item := range res {
-		items = append(items, item)
+		items = append(items, item.Itemid)
 	}
 
 	return items, nil
+}
+
+func (r *DiscountRuleRepository) FindAppliedDiscountsForOrder(ctx context.Context, order string) (*[]entity.DiscountRule, error) {
+
+	discounts, err := r.Queries.FindAppliedDiscountRulesForOrder(ctx, order)
+	if err != nil {
+		return nil, err
+	}
+
+	rules := make([]entity.DiscountRule, 0)
+
+	for _, discount := range discounts {
+		code := ""
+		if discount.Discountcode.Valid {
+			code = discount.Discountcode.String
+		}
+		rules = append(rules, entity.DiscountRule{
+			ID:                 discount.Discountrule,
+			Code:               code,
+			AutoApply:          discount.Autoapply == 1,
+			Name:               discount.Discountname,
+			DiscountRaw:        discount.Discountraw,
+			DiscountPercentual: discount.Discountpercentual,
+			ApplyFirst:         discount.Applyfirst,
+			AboveValue:         discount.Abovevalue,
+			BellowValue:        discount.Bellowvalue,
+			ValidFrom:          discount.Validfrom,
+			ValidUntil:         discount.Validuntil,
+			Type:               []rune(discount.Discounttype)[0],
+		})
+	}
+
+	return &rules, nil
+}
+
+func (r *DiscountRuleRepository) FindAutoApplyDiscountRulesForItem(ctx context.Context, item string) (*[]entity.DiscountRule, error) {
+	discounts, err := r.Queries.FindAutoApplyDiscountRulesForItem(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	rules := make([]entity.DiscountRule, 0)
+
+	for _, discount := range discounts {
+		code := ""
+		if discount.Discountcode.Valid {
+			code = discount.Discountcode.String
+		}
+		rules = append(rules, entity.DiscountRule{
+			ID:                 discount.Discountrule,
+			Code:               code,
+			AutoApply:          discount.Autoapply == 1,
+			Name:               discount.Discountname,
+			DiscountRaw:        discount.Discountraw,
+			DiscountPercentual: discount.Discountpercentual,
+			ApplyFirst:         discount.Applyfirst,
+			AboveValue:         discount.Abovevalue,
+			BellowValue:        discount.Bellowvalue,
+			ValidFrom:          discount.Validfrom,
+			ValidUntil:         discount.Validuntil,
+			Type:               []rune(discount.Discounttype)[0],
+		})
+	}
+
+	return &rules, nil
 }

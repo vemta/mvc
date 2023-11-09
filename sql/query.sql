@@ -106,8 +106,8 @@ AND VMT_DiscountRules.ValidFrom <= ? AND VMT_DiscountRules.ValidUntil >= ?;
 
 -- name: CreateDiscountRule :exec
 INSERT INTO VMT_DiscountRules 
-(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, AboveValue, BellowValue, ValidFrom, ValidUntil, Type)
-VALUES (?,?,?,?,?,?,?,?,?,?);
+(ID, Name, DiscountRaw, DiscountPercentual, ApplyFirst, AboveValue, BellowValue, ValidFrom, ValidUntil, Type, Code, AutoApply)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?);
 
 -- name: CreateItemForDiscountRule :exec
 INSERT INTO VMT_DiscountRuleItems
@@ -133,5 +133,45 @@ INNER JOIN VMT_Items ON VMT_Items.ID = VMT_DiscountRuleItems.Item
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_DiscountRuleItems.Item
 WHERE DiscountRule = ?;
 
+-- name: FindAutoAppliedDiscountsForOrder :many
+
+
 -- name: FindValidItemsForDiscountRule :many 
 SELECT Item FROM VMT_DiscountRuleItems WHERE DiscountRule = ?;
+
+-- name: FindAppliedDiscountRulesForOrder :many
+SELECT
+VMT_DiscountRules.ID DiscountRule,
+VMT_DiscountRules.Name DiscountName,
+VMT_DiscountRules.DiscountRaw DiscountRaw,
+VMT_DiscountRules.DiscountPercentual DiscountPercentual,
+VMT_DiscountRules.ApplyFirst ApplyFirst,
+VMT_DiscountRules.AboveValue AboveValue,
+VMT_DiscountRules.BellowValue BellowValue,
+VMT_DiscountRules.ValidFrom ValidFrom,
+VMT_DiscountRules.ValidUntil ValidUntil,
+VMT_DiscountRules.Type DiscountType,
+VMT_DiscountRules.Code DiscountCode,
+VMT_DiscountRules.AutoApply AutoApply
+FROM
+VMT_OrderAppliedDiscounts
+INNER JOIN VMT_DiscountRules ON VMT_DiscountRules.ID = VMT_OrderAppliedDiscounts.DiscountRule
+WHERE VMT_OrderAppliedDiscounts.OrderID = ?;
+
+-- name: FindAutoApplyDiscountRulesForItem :many
+SELECT 
+VMT_DiscountRules.ID DiscountRule,
+VMT_DiscountRules.Name DiscountName,
+VMT_DiscountRules.DiscountRaw DiscountRaw,
+VMT_DiscountRules.DiscountPercentual DiscountPercentual,
+VMT_DiscountRules.ApplyFirst ApplyFirst,
+VMT_DiscountRules.AboveValue AboveValue,
+VMT_DiscountRules.BellowValue BellowValue,
+VMT_DiscountRules.ValidFrom ValidFrom,
+VMT_DiscountRules.ValidUntil ValidUntil,
+VMT_DiscountRules.Type DiscountType,
+VMT_DiscountRules.Code DiscountCode,
+VMT_DiscountRules.AutoApply AutoApply
+FROM VMT_DiscountRuleItems
+INNER JOIN VMT_DiscountRules ON VMT_DiscountRules.ID = VMT_DiscountRules.DiscountRule
+WHERE Item = ? AND VMT_DiscountRules.AutoApply = 1;

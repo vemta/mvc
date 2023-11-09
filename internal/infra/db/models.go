@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"fmt"
 	"time"
@@ -65,16 +66,18 @@ type VmtCustomercart struct {
 }
 
 type VmtDiscountrule struct {
-	ID                 string    `json:"id"`
-	Name               string    `json:"name"`
-	Discountraw        float64   `json:"discountraw"`
-	Discountpercentual float64   `json:"discountpercentual"`
-	Applyfirst         string    `json:"applyfirst"`
-	Abovevalue         float64   `json:"abovevalue"`
-	Bellowvalue        float64   `json:"bellowvalue"`
-	Validfrom          time.Time `json:"validfrom"`
-	Validuntil         time.Time `json:"validuntil"`
-	Type               string    `json:"type"`
+	ID                 string         `json:"id"`
+	Name               string         `json:"name"`
+	Discountraw        float64        `json:"discountraw"`
+	Discountpercentual float64        `json:"discountpercentual"`
+	Applyfirst         string         `json:"applyfirst"`
+	Abovevalue         float64        `json:"abovevalue"`
+	Bellowvalue        float64        `json:"bellowvalue"`
+	Validfrom          time.Time      `json:"validfrom"`
+	Validuntil         time.Time      `json:"validuntil"`
+	Type               string         `json:"type"`
+	Code               sql.NullString `json:"code"`
+	Autoapply          int32          `json:"autoapply"`
 }
 
 type VmtDiscountruleitem struct {
@@ -118,6 +121,11 @@ type VmtOrder struct {
 	Status             int32   `json:"status"`
 	Discountraw        float64 `json:"discountraw"`
 	Discountpercentual float64 `json:"discountpercentual"`
+}
+
+type VmtOrderapplieddiscount struct {
+	Orderid      string `json:"orderid"`
+	Discountrule string `json:"discountrule"`
 }
 
 type VmtOrderdetail struct {

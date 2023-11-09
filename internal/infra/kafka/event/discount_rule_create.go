@@ -9,15 +9,15 @@ import (
 	uow "github.com/vemta/mvc/pkg"
 )
 
-type ProcessNewItemDiscountRule struct{}
+type ProcessNewDiscountRule struct{}
 
-func (p ProcessNewItemDiscountRule) Process(ctx context.Context, msg *kafka.Message, uow uow.UowInterface) error {
-	var input usecase.CreateItemDiscountRuleUsecaseInput
+func (p ProcessNewDiscountRule) Process(ctx context.Context, msg *kafka.Message, uow uow.UowInterface) error {
+	var input usecase.CreateDiscountRuleUsecaseInput
 	err := json.Unmarshal(msg.Value, &input)
 	if err != nil {
 		return err
 	}
-	uc := usecase.NewCreateItemDiscountRuleUsecase(uow)
+	uc := usecase.NewCreateDiscountRuleUsecase(uow)
 	err = uc.Execute(ctx, input)
 	if err != nil {
 		return err
