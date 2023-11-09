@@ -40,7 +40,8 @@ type DiscountRuleRepositoryInterface interface {
 	FindActiveDiscountRules(context.Context, time.Time) (*[]any, error)
 	FindItemsForDiscountRule(context.Context, string) ([]string, error)
 	FindAppliedDiscountsForOrder(context.Context, string) (*[]entity.DiscountRule, error)
-	FindAutoApplyDiscountRulesForItem(context.Context, string) (*[]entity.DiscountRule, error)
+	FindAutoApplyDiscountRulesForItem(context.Context, string, time.Time) (*[]entity.DiscountRule, error)
+	FindAutoApplyDiscountRulesForOrder(context.Context, float64, time.Time) (*[]entity.DiscountRule, error)
 	CreateItemDiscountRule(context.Context, *entity.ItemDiscountRule) error
 	CreateOrderDiscountRule(context.Context, *entity.OrderDiscountRule) error
 }

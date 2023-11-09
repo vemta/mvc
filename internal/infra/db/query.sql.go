@@ -220,35 +220,6 @@ func (q *Queries) FindAppliedDiscountRulesForOrder(ctx context.Context, orderid 
 	return items, nil
 }
 
-const findAutoAppliedDiscountsForOrder = `-- name: FindAutoAppliedDiscountsForOrder :many
-
-
-SELECT Item FROM VMT_DiscountRuleItems WHERE DiscountRule = ?
-`
-
-func (q *Queries) FindAutoAppliedDiscountsForOrder(ctx context.Context, discountrule string) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, findAutoAppliedDiscountsForOrder, discountrule)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var item string
-		if err := rows.Scan(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const findAutoApplyDiscountRulesForItem = `-- name: FindAutoApplyDiscountRulesForItem :many
 SELECT 
 VMT_DiscountRules.ID DiscountRule,
@@ -265,8 +236,14 @@ VMT_DiscountRules.Code DiscountCode,
 VMT_DiscountRules.AutoApply AutoApply
 FROM VMT_DiscountRuleItems
 INNER JOIN VMT_DiscountRules ON VMT_DiscountRules.ID = VMT_DiscountRules.DiscountRule
-WHERE Item = ? AND VMT_DiscountRules.AutoApply = 1
+WHERE Item = ? AND VMT_DiscountRules.AutoApply = 1 AND ValidFrom >= ? AND ValidUntil <= ?
 `
+
+type FindAutoApplyDiscountRulesForItemParams struct {
+	Item       string    `json:"item"`
+	Validfrom  time.Time `json:"validfrom"`
+	Validuntil time.Time `json:"validuntil"`
+}
 
 type FindAutoApplyDiscountRulesForItemRow struct {
 	Discountrule       string         `json:"discountrule"`
@@ -283,8 +260,8 @@ type FindAutoApplyDiscountRulesForItemRow struct {
 	Autoapply          int32          `json:"autoapply"`
 }
 
-func (q *Queries) FindAutoApplyDiscountRulesForItem(ctx context.Context, item string) ([]FindAutoApplyDiscountRulesForItemRow, error) {
-	rows, err := q.db.QueryContext(ctx, findAutoApplyDiscountRulesForItem, item)
+func (q *Queries) FindAutoApplyDiscountRulesForItem(ctx context.Context, arg FindAutoApplyDiscountRulesForItemParams) ([]FindAutoApplyDiscountRulesForItemRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAutoApplyDiscountRulesForItem, arg.Item, arg.Validfrom, arg.Validuntil)
 	if err != nil {
 		return nil, err
 	}
@@ -292,6 +269,87 @@ func (q *Queries) FindAutoApplyDiscountRulesForItem(ctx context.Context, item st
 	var items []FindAutoApplyDiscountRulesForItemRow
 	for rows.Next() {
 		var i FindAutoApplyDiscountRulesForItemRow
+		if err := rows.Scan(
+			&i.Discountrule,
+			&i.Discountname,
+			&i.Discountraw,
+			&i.Discountpercentual,
+			&i.Applyfirst,
+			&i.Abovevalue,
+			&i.Bellowvalue,
+			&i.Validfrom,
+			&i.Validuntil,
+			&i.Discounttype,
+			&i.Discountcode,
+			&i.Autoapply,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findAutoApplyDiscountRulesForOrder = `-- name: FindAutoApplyDiscountRulesForOrder :many
+SELECT 
+VMT_DiscountRules.ID DiscountRule,
+VMT_DiscountRules.Name DiscountName,
+VMT_DiscountRules.DiscountRaw DiscountRaw,
+VMT_DiscountRules.DiscountPercentual DiscountPercentual,
+VMT_DiscountRules.ApplyFirst ApplyFirst,
+VMT_DiscountRules.AboveValue AboveValue,
+VMT_DiscountRules.BellowValue BellowValue,
+VMT_DiscountRules.ValidFrom ValidFrom,
+VMT_DiscountRules.ValidUntil ValidUntil,
+VMT_DiscountRules.Type DiscountType,
+VMT_DiscountRules.Code DiscountCode,
+VMT_DiscountRules.AutoApply AutoApply
+FROM VMT_DiscountRules
+WHERE VMT_DiscountRules.AutoApply = 1 AND ValidFrom >= ? AND ValidUntil <= ? AND BellowValue >= ? AND AboveValue <= ?
+`
+
+type FindAutoApplyDiscountRulesForOrderParams struct {
+	Validfrom   time.Time `json:"validfrom"`
+	Validuntil  time.Time `json:"validuntil"`
+	Bellowvalue float64   `json:"bellowvalue"`
+	Abovevalue  float64   `json:"abovevalue"`
+}
+
+type FindAutoApplyDiscountRulesForOrderRow struct {
+	Discountrule       string         `json:"discountrule"`
+	Discountname       string         `json:"discountname"`
+	Discountraw        float64        `json:"discountraw"`
+	Discountpercentual float64        `json:"discountpercentual"`
+	Applyfirst         string         `json:"applyfirst"`
+	Abovevalue         float64        `json:"abovevalue"`
+	Bellowvalue        float64        `json:"bellowvalue"`
+	Validfrom          time.Time      `json:"validfrom"`
+	Validuntil         time.Time      `json:"validuntil"`
+	Discounttype       string         `json:"discounttype"`
+	Discountcode       sql.NullString `json:"discountcode"`
+	Autoapply          int32          `json:"autoapply"`
+}
+
+func (q *Queries) FindAutoApplyDiscountRulesForOrder(ctx context.Context, arg FindAutoApplyDiscountRulesForOrderParams) ([]FindAutoApplyDiscountRulesForOrderRow, error) {
+	rows, err := q.db.QueryContext(ctx, findAutoApplyDiscountRulesForOrder,
+		arg.Validfrom,
+		arg.Validuntil,
+		arg.Bellowvalue,
+		arg.Abovevalue,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindAutoApplyDiscountRulesForOrderRow
+	for rows.Next() {
+		var i FindAutoApplyDiscountRulesForOrderRow
 		if err := rows.Scan(
 			&i.Discountrule,
 			&i.Discountname,
@@ -653,7 +711,7 @@ SELECT discountrule, item, id, name, discountraw, discountpercentual, applyfirst
 INNER JOIN VMT_DiscountRules ON VMT_DiscountRules.ID = VMT_DiscountRuleItems.DiscountRule
 WHERE VMT_DiscountRuleItems.Item = ?
 AND VMT_DiscountRules.ValidFrom >= ? AND VMT_DiscountRules.ValidUntil <= ?
-AND VMT_DiscountRules.AboveValue >= ? AND VMT_DiscountRules.BellowValue <= ?
+AND VMT_DiscountRules.AboveValue <= ? AND VMT_DiscountRules.BellowValue >= ?
 ORDER BY VMT_DiscountRules.ID
 `
 
@@ -728,21 +786,21 @@ func (q *Queries) FindValidDiscountRulesForItem(ctx context.Context, arg FindVal
 
 const findValidDiscountRulesForOrder = `-- name: FindValidDiscountRulesForOrder :many
 SELECT id, name, discountraw, discountpercentual, applyfirst, abovevalue, bellowvalue, validfrom, validuntil, type, code, autoapply FROM VMT_DiscountRules
-WHERE VMT_DiscountRules.AboveValue >= ? AND BellowValue <= ? 
+WHERE BellowValue >= ? AND AboveValue <= ?
 AND VMT_DiscountRules.ValidFrom <= ? AND VMT_DiscountRules.ValidUntil >= ?
 `
 
 type FindValidDiscountRulesForOrderParams struct {
-	Abovevalue  float64   `json:"abovevalue"`
 	Bellowvalue float64   `json:"bellowvalue"`
+	Abovevalue  float64   `json:"abovevalue"`
 	Validfrom   time.Time `json:"validfrom"`
 	Validuntil  time.Time `json:"validuntil"`
 }
 
 func (q *Queries) FindValidDiscountRulesForOrder(ctx context.Context, arg FindValidDiscountRulesForOrderParams) ([]VmtDiscountrule, error) {
 	rows, err := q.db.QueryContext(ctx, findValidDiscountRulesForOrder,
-		arg.Abovevalue,
 		arg.Bellowvalue,
+		arg.Abovevalue,
 		arg.Validfrom,
 		arg.Validuntil,
 	)
@@ -770,6 +828,33 @@ func (q *Queries) FindValidDiscountRulesForOrder(ctx context.Context, arg FindVa
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findValidItemsForDiscountRule = `-- name: FindValidItemsForDiscountRule :many
+SELECT Item FROM VMT_DiscountRuleItems WHERE DiscountRule = ?
+`
+
+func (q *Queries) FindValidItemsForDiscountRule(ctx context.Context, discountrule string) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, findValidItemsForDiscountRule, discountrule)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var item string
+		if err := rows.Scan(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err

@@ -96,12 +96,12 @@ SELECT * FROM VMT_DiscountRuleItems
 INNER JOIN VMT_DiscountRules ON VMT_DiscountRules.ID = VMT_DiscountRuleItems.DiscountRule
 WHERE VMT_DiscountRuleItems.Item = ?
 AND VMT_DiscountRules.ValidFrom >= ? AND VMT_DiscountRules.ValidUntil <= ?
-AND VMT_DiscountRules.AboveValue >= ? AND VMT_DiscountRules.BellowValue <= ?
+AND VMT_DiscountRules.AboveValue <= ? AND VMT_DiscountRules.BellowValue >= ?
 ORDER BY VMT_DiscountRules.ID;
 
 -- name: FindValidDiscountRulesForOrder :many
 SELECT * FROM VMT_DiscountRules
-WHERE VMT_DiscountRules.AboveValue >= ? AND BellowValue <= ? 
+WHERE BellowValue >= ? AND AboveValue <= ?
 AND VMT_DiscountRules.ValidFrom <= ? AND VMT_DiscountRules.ValidUntil >= ?;
 
 -- name: CreateDiscountRule :exec
@@ -132,8 +132,6 @@ FROM VMT_DiscountRuleItems
 INNER JOIN VMT_Items ON VMT_Items.ID = VMT_DiscountRuleItems.Item
 INNER JOIN VMT_ItemsValuation ON VMT_ItemsValuation.ItemID = VMT_DiscountRuleItems.Item
 WHERE DiscountRule = ?;
-
--- name: FindAutoAppliedDiscountsForOrder :many
 
 
 -- name: FindValidItemsForDiscountRule :many 
@@ -174,4 +172,21 @@ VMT_DiscountRules.Code DiscountCode,
 VMT_DiscountRules.AutoApply AutoApply
 FROM VMT_DiscountRuleItems
 INNER JOIN VMT_DiscountRules ON VMT_DiscountRules.ID = VMT_DiscountRules.DiscountRule
-WHERE Item = ? AND VMT_DiscountRules.AutoApply = 1;
+WHERE Item = ? AND VMT_DiscountRules.AutoApply = 1 AND ValidFrom >= ? AND ValidUntil <= ?;
+
+-- name: FindAutoApplyDiscountRulesForOrder :many
+SELECT 
+VMT_DiscountRules.ID DiscountRule,
+VMT_DiscountRules.Name DiscountName,
+VMT_DiscountRules.DiscountRaw DiscountRaw,
+VMT_DiscountRules.DiscountPercentual DiscountPercentual,
+VMT_DiscountRules.ApplyFirst ApplyFirst,
+VMT_DiscountRules.AboveValue AboveValue,
+VMT_DiscountRules.BellowValue BellowValue,
+VMT_DiscountRules.ValidFrom ValidFrom,
+VMT_DiscountRules.ValidUntil ValidUntil,
+VMT_DiscountRules.Type DiscountType,
+VMT_DiscountRules.Code DiscountCode,
+VMT_DiscountRules.AutoApply AutoApply
+FROM VMT_DiscountRules
+WHERE VMT_DiscountRules.AutoApply = 1 AND ValidFrom >= ? AND ValidUntil <= ? AND BellowValue >= ? AND AboveValue <= ?;

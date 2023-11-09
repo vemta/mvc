@@ -25,7 +25,7 @@ func (u *FindItemFinalPriceUsecase) Execute(ctx context.Context, id string) (flo
 	}
 
 	currentPrice := item.Valuation.LastPrice
-	rules, e := repository.GetDiscountRulesRepository(ctx, u.Uow).FindValidDiscountRulesForItem(ctx, id, time.Now())
+	rules, e := repository.GetDiscountRulesRepository(ctx, u.Uow).FindAutoApplyDiscountRulesForItem(ctx, id, time.Now())
 	if e != nil {
 		return currentPrice, nil
 	}
